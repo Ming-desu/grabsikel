@@ -1,0 +1,1 @@
+exports.getErrors = error => error.details.map(x => x.message)

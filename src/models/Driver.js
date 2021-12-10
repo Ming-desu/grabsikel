@@ -25,7 +25,6 @@ const schema = mongoose.Schema({
       type: String,
       required: true
     },
-    email: String,
     address: {
       street: String,
       barangay: {
@@ -56,14 +55,12 @@ const schema = mongoose.Schema({
       required: true
     },
   },
-  account: {
-    username: String,
-    password: String,
-    status: {
-      type: String,
-      enum: ['pending', 'accepted', 'rejected'],
-      default: 'pending'
-    }
+  email: String,
+  password: String,
+  status: {
+    type: String,
+    enum: ['pending', 'accepted', 'rejected'],
+    default: 'pending'
   }
 }, {
   timestamps: {

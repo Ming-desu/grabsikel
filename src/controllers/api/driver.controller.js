@@ -24,7 +24,7 @@ exports.read = async function(req, res) {
         { 'account.username': new RegExp(q) }
       ]
     })
-      .select('-account.password')
+      .select('-password')
       .limit(limit)
       .skip((page - 1) * limit)
       .sort('profile.name.first_name')
@@ -50,7 +50,7 @@ exports.find = async function(req, res) {
   try {
     const id = req.params.id
 
-    const driver = await Driver.findById(id).select('-account.password')
+    const driver = await Driver.findById(id).select('-password')
 
     if (!driver) {
       throw new Error('Driver does not exists.')
@@ -84,6 +84,15 @@ exports.store = async function(req, res) {
 
   try {
     const driver = new Driver()
+
+    const exists = await Driver.findOne({
+      email: req.body.email
+    })
+
+    if (exists) {
+      throw new Error('Email already exists.')
+    }
+
     driver.set(req.body)
 
     await driver.save()
@@ -116,11 +125,15 @@ exports.update = async function(req, res) {
   } 
 
   try {
+    if (!req.body.email) {
+      throw new Error('Email is required.')
+    }
+
     const { 
       profile,
       contact,
       vehicle,
-      account
+      email
     } = req.body
 
     const driver = await Driver.findById(req.body._id)
@@ -129,24 +142,40 @@ exports.update = async function(req, res) {
       throw new Error('Driver does not exists.')
     }
 
+    const exists = await Driver.findOne({
+      $and: [
+        { email },
+        { 
+          _id: {
+            $ne: req.body._id
+          }  
+        }
+      ]
+    })
+
+    if (exists) {
+      throw new Error('Email already exists.')
+    }
+
+    if (!driver.password && !req.body.password) {
+      throw new Error('Password is required.')
+    }
+
     driver.set({
       profile,
       contact,
       vehicle,
+      email
     })
 
-    if (account && account.status) {
-      driver.account.status = account.status
+    if (req.body.status) {
+      driver.status = req.body.status
     }
 
-    if (account && account.username) {
-      driver.account.username = account.username
-    }
+    if (req.body.password) {
+      const password_hash = bcrypt.hashSync(req.body.password, 10)
 
-    if (account && account.password) {
-      const password_hash = bcrypt.hashSync(account.password, 10)
-
-      driver.account.password = password_hash
+      driver.password = password_hash
     }
 
     await driver.save()
@@ -172,7 +201,7 @@ exports.delete = async function(req, res) {
   try {
     const id = req.body.id
 
-    const driver = await Driver.findById(id).select('-account.password')
+    const driver = await Driver.findById(id).select('-password')
 
     if (!driver) {
       throw new Error('Driver does not exists.')

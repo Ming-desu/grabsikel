@@ -13,7 +13,6 @@ const schema = Joi.object().keys({
   }),
   contact: Joi.object().keys({
     number: Joi.string().regex(/^(09|\+639)\d{9}$/).message('Please enter a valid phone number.').required().label('Contact number'),
-    email: Joi.string().email().label('Email address'),
     address: Joi.object().keys({
       street: Joi.string().max(255).default(null).label('Street'),
       barangay: Joi.string().max(255).required().label('Barangay'),
@@ -26,11 +25,9 @@ const schema = Joi.object().keys({
     franchise_number: Joi.string().required().label('Franchise number'),
     license_number: Joi.string().required().label('License number')
   }),
-  account: {
-    username: Joi.string().alphanum().min(6).max(24).label('Username'),
-    password: Joi.string().min(8).label('Password'),
-    status: Joi.string().default('pending').label('Status')
-  }
+  email: Joi.string().email().label('Email'),
+  password: Joi.string().min(8).label('Password'),
+  status: Joi.string().default('pending').label('Status')
 })
 
 module.exports = schema

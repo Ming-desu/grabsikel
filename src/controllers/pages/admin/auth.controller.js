@@ -55,3 +55,23 @@ exports.login = async function(req, res) {
     })
   }
 }
+
+/**
+ * Logouts user from the system
+ * 
+ * @param {Request} req 
+ * @param {Response} res 
+ */
+exports.logout = function(req, res) {
+  res.cookie('token', '', {
+    maxAge: -1000 * 60 * 60 * 24 * 7,
+    httpOnly: true
+  })
+
+  res.cookie('refresh_token', '', {
+    maxAge: -1000 * 60 * 60 * 3,
+    httpOnly: true
+  })
+
+  res.redirect('/admin/auth/login')
+}

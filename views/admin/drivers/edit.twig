@@ -31,9 +31,17 @@
                       <input type="email" name="email" id="email" class="form-control" placeholder="yourname@domain.com" value="{{ driver.email }}" required>
                       <label for="email">Email address</label>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                       <label for="picture" class="form-label">Profile picture</label>
                       <input class="form-control" type="file" name="picture" id="picture">
+                    </div>
+                    <div class="form-group">
+                      <label for="status" class="form-label">Approval Status</label>
+                      <select name="status" id="status" class="form-select" required>
+                        <option value="pending" {{ driver.status == 'pending' ? 'checked' : '' }}>pending</option>
+                        <option value="accepted" {{ driver.status == 'accepted' ? 'checked' : '' }}>accepted</option>
+                        <option value="rejected" {{ driver.status == 'rejected' ? 'checked' : '' }}>rejected</option>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -137,6 +145,7 @@
 
         const _id = this._id.value
         const email = this.email.value
+        const status = this.status.value
         const contact_number = this.contact_number.value
         const street = this.street.value
         const barangay = this.barangay.value
@@ -180,7 +189,8 @@
             franchise_number,
             license_number
           },
-          email
+          email,
+          status
         })
           .then(res => window.location.href = '/admin/drivers')
           .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))

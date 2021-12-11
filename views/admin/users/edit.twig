@@ -1,0 +1,156 @@
+{% extends "base.twig" %}
+
+{% block title %}
+  Drivers
+{% endblock %}
+
+{% block body %}
+  <div class="container p-0 min-vh-100">
+    <div class="d-flex min-vh-100">
+      {% include "admin/layouts/nav.twig" %}
+      <main class="col-12 col-md-8 col-lg-9 col-xl-10">
+        {% include "admin/layouts/header.twig" %}
+        <div class="p-4">
+          <nav class="mb-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">Home</li>
+              <li class="breadcrumb-item"><a href="/admin/users">Users</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Edit existing user</li>
+            </ol>
+          </nav>
+          {# TODO :: Hide if current user logged in is selected #}
+          <form action="/admin/users/{{ user._id }}/delete" class="text-end mb-4" name="form_delete" method="POST">
+            <input type="hidden" name="id" value="{{ user._id }}">
+            <button type="submit" name="submit" class="btn btn-danger">
+              <i class="las la-times"></i>
+              Delete User
+            </button>
+          </form>
+          <form action="/admin/users/{{ user._id }}/edit" name="form_edit" method="POST" enctype="multipart/form-data">
+            <div id="error"></div>
+            <input type="hidden" name="_id" value="{{ user._id }}">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <h3 class="card-title h5">Account Information</h3>
+                    <p class="card-text text-muted mb-4">The following information will be available to the public.</p>
+                    <div class="form-floating mb-3">
+                      <input type="email" name="email" id="email" class="form-control" placeholder="yourname@domain.com" value="{{ user.email }}" required>
+                      <label for="email">Email address</label>
+                    </div>
+                    <div class="form-group mb-3">
+                      <label for="picture" class="form-label">Profile picture</label>
+                      <input class="form-control" type="file" name="picture" id="picture">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <h3 class="card-title h5">Personal Information</h3>
+                    <p class="card-text text-muted mb-4">This information will be available in the public.</p>
+                    <div class="form-floating mb-3">
+                      <input type="text" name="first_name" id="first_name" class="form-control" placeholder="First name" value="{{ user.name.first_name }}" required>
+                      <label for="first_name">First name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                      <input type="text" name="middle_name" id="middle_name" class="form-control" placeholder="Middle name" value="{{ user.name.middle_name }}">
+                      <label for="middle_name">Middle name</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                      <input type="text" name="last_name" id="last_name" class="form-control" placeholder="Last name" value="{{ user.name.last_name }}" required>
+                      <label for="last_name">Last name</label>
+                    </div>
+                    <div class="form-group">
+                      <label for="male" class="form-label">Sex</label>
+                      <div class="d-flex justify-content-end">
+                        <div class="form-check">
+                          <input type="radio" name="sex" id="male" class="form-check-input" value="Male" {{ user.sex == 'Male' ? 'checked' : '' }}>
+                          <label for="male" class="form-check-label">Male</label>
+                        </div>
+                        <div class="form-check ms-3">
+                          <input type="radio" name="sex" id="female" class="form-check-input" value="Female" {{ user.sex == 'Female' ? 'checked' : '' }}>
+                          <label for="female" class="form-check-label">Female</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <a href="/admin/users" class="btn border text-muted me-2">Cancel</a>
+                  <button type="submit" name="submit" class="btn btn-primary">Save</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.forms.form_edit
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault()
+
+        const _id = this._id.value
+        const email = this.email.value
+        const first_name = this.first_name.value
+        const middle_name = this.middle_name.value
+        const last_name = this.last_name.value
+        const sex = this.querySelector('[name="sex"]:checked').value
+
+        if (!email || !first_name || !last_name) {
+          return showError('Please fill out the required fields.')
+        }
+        
+        this.submit.disabled = true
+
+        axios.patch(this.action, {
+          _id,
+          name: {
+            first_name,
+            middle_name,
+            last_name
+          },
+          sex,
+          email
+        })
+          .then(res => window.location.href = '/admin/users')
+          .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))
+
+        this.submit.disabled = false
+      })
+
+      const form_delete = document.forms.form_delete
+
+      form_delete.addEventListener('submit', function(e) {
+        e.preventDefault()
+
+        if (!confirm('Are you sure you want to delete this user?')) {
+          return
+        }
+
+        const id = this.id.value
+
+        this.submit.disabled = true
+
+        axios.delete(this.action, {
+          data: {
+            id
+          }
+        })
+          .then(res => window.location.href = '/admin/users')
+          .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))
+      
+        this.submit.disabled = false
+      })
+    })
+  </script>
+{% endblock %}

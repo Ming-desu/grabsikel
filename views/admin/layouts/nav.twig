@@ -26,6 +26,12 @@
         </a>
       </li>
       <li class="list-group-item bg-dark">
+        <a href="/admin/users" class="text-decoration-none btn {{ path|indexOf('/admin/users') > -1 ? 'btn-primary' : 'btn-dark' }} w-100 d-flex align-items-center text-start">
+          <i class="las la-user"></i>
+          <span class="ms-2">Users</span>
+        </a>
+      </li>
+      <li class="list-group-item bg-dark">
         <a href="/api/logout" class="text-decoration-none btn btn-dark w-100 d-flex align-items-center text-start">
           <i class="las la-sign-out-alt"></i>
           <span class="ms-2">Logout</span>

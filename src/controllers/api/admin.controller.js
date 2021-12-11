@@ -195,6 +195,10 @@ exports.delete = async function(req, res) {
   try {
     const id = req.body.id
 
+    if (id == req.api_user._id) {
+      throw new Error('Cannot delete own account.')
+    }
+
     const admin = await Admin.findById(id).select('-password')
 
     if (!admin) {

@@ -15,6 +15,8 @@ Router.use((req, res, next) => {
 
     const token = bearer.replace('Bearer ', '')
     const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] })
+
+    req.api_user = decoded.sub
   }
   catch(err) {
     return res.status(400).json({

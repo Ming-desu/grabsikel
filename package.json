@@ -15,12 +15,15 @@
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
     "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
     "express-session": "^1.17.2",
-    "gm": "^1.23.1",
+    "glob": "^7.2.0",
     "joi": "^17.5.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.1.1",
-    "twig": "^1.15.4"
+    "sharp": "^0.29.3",
+    "twig": "^1.15.4",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "faker": "^5.5.3",

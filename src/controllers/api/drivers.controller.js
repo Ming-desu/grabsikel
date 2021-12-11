@@ -2,8 +2,12 @@ const { Request, Response } = require('express')
 const schema = require('../../validators/driver.validator')
 const { getErrors } = require('../../utils/joi.helper')
 const bcrypt = require('bcrypt')
+const fs = require('fs')
+const glob = require('glob')
+const path = require('path')
 
 const Driver = require('../../models/Driver')
+const { ROOT_DIR } = require('../../../config')
 
 /**
  * Reads driver information from the database
@@ -138,6 +142,8 @@ exports.update = async function(req, res) {
 
     const driver = await Driver.findById(req.body._id)
 
+    const prev_picture = driver.profile.picture
+
     if (!driver) {
       throw new Error('Driver does not exists.')
     }
@@ -179,6 +185,27 @@ exports.update = async function(req, res) {
     res.json({
       message: 'Successfully updated a driver.'
     })
+
+    if (req.body.profile.picture) {
+      const chunks = prev_picture.split('.')
+      chunks.pop()
+
+      const pattern = `${chunks.join('.')}*`
+
+      glob(pattern, {
+        cwd: path.join(ROOT_DIR, 'public/uploads')
+      }, (err, files) => {
+        if (err) {
+          return
+        }
+
+        files.forEach(file => {
+          if (fs.existsSync(path.join(ROOT_DIR, 'public/uploads', file))) {
+            fs.unlinkSync(path.join(ROOT_DIR, 'public/uploads', file))
+          }
+        })
+      })
+    }  
   }
   catch(err) {
     res.status(400).json({
@@ -201,6 +228,27 @@ exports.delete = async function(req, res) {
 
     if (!driver) {
       throw new Error('Driver does not exists.')
+    }
+
+    if (driver.profile.picture) {
+      const chunks = driver.profile.picture.split('.')
+      chunks.pop()
+
+      const pattern = `${chunks.join('.')}*`
+
+      glob(pattern, {
+        cwd: path.join(ROOT_DIR, 'public/uploads')
+      }, (err, files) => {
+        if (err) {
+          return
+        }
+
+        files.forEach(file => {
+          if (fs.existsSync(path.join(ROOT_DIR, 'public/uploads', file))) {
+            fs.unlinkSync(path.join(ROOT_DIR, 'public/uploads', file))
+          }
+        })
+      })
     }
 
     await driver.delete()

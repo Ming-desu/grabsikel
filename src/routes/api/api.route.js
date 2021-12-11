@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const { JWT_SECRET } = require('../../../config')
 
 Router.use('/auth', require('./api.auth.route'))
+Router.use('/uploads', require('./api.uploads.route'))
 
 Router.use((req, res, next) => {
   try {

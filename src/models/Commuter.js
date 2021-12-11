@@ -43,4 +43,4 @@ schema.virtual('full_name').get(function() {
 
 schema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('Commutersex', schema)
+module.exports = mongoose.model('Commuter', schema)

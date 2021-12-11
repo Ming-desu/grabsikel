@@ -1,6 +1,8 @@
 const express = require('express')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
+const fileUpload = require('express-fileupload')
+const path = require('path')
 const app = express()
 
 const axios = require('axios')
@@ -9,7 +11,8 @@ const twig = require('twig')
 const { 
   COOKIE_SECRET, 
   PORT, 
-  BASE_URL
+  BASE_URL,
+  ROOT_DIR
 } = require('./config')
 
 axios.defaults.baseURL = BASE_URL
@@ -31,6 +34,18 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   secret: COOKIE_SECRET
+}))
+
+app.use(cookieParser())
+
+app.use(express.static('public'))
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json({ limit: '10mb' }))
+
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 },
+  useTempFiles: true,
+  tempFileDir: path.resolve(ROOT_DIR, '/tmp')
 }))
 
 // Create a custom error handler in session
@@ -67,12 +82,6 @@ app.use((req, res, next) => {
 
   next()
 })
-
-app.use(cookieParser())
-
-app.use(express.static('public'))
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json({ limit: '10mb' }))
 
 // Admin Routes
 app.use('/admin', require('./src/routes/pages/admin/index.route'))

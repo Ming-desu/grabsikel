@@ -125,6 +125,13 @@ exports.store = async function(req, res) {
       }
     })
 
+    if (res.locals.AUTHENTICATED_USER._id == req.body._id) {
+      res.cookie('r', Date.now(), {
+        maxAge: 1000 * 60 * 60,
+        httpOnly: true
+      })
+    }
+
     res.json({
       message
     })

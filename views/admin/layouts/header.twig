@@ -10,15 +10,15 @@
   </div>
   <div class="dropdown d-none d-md-block">
     <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      {% if user.picture != null %}
-        <img src="/uploads/{{ user.picture }}" width="35" height="35" alt="{{ [user.name.first_name, user.name.last_name] | join(' ') }} picture" class="rounded-circle border">
+      {% if AUTHENTICATED_USER.picture %}
+        <img src="/uploads/{{ AUTHENTICATED_USER.picture }}" width="35" height="35" alt="{{ AUTHENTICATED_USER.full_name }} picture" class="rounded-circle border">
       {% else %}
-        <img src="https://avatars.dicebear.com/api/initials/{{ user.display_name }}.svg?size=30" width="35" height="35" class="rounded-circle border" alt="{{ user.display_name }} initials">
+        <img src="https://avatars.dicebear.com/api/initials/{{ AUTHENTICATED_USER.full_name }}.svg?size=30" width="35" height="35" class="rounded-circle border" alt="{{ AUTHENTICATED_USER.full_name }} initials">
       {% endif %}
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
       <li><a href="" class="dropdown-item">Profile</a></li>
-      <li><a href="/api/logout" class="dropdown-item">Logout</a></li>
+      <li><a href="/admin/auth/logout" class="dropdown-item">Logout</a></li>
     </ul>
   </div>
 </header>

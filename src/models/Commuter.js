@@ -37,4 +37,10 @@ const schema = mongoose.Schema({
   }
 })
 
+schema.virtual('full_name').get(function() {
+  return [this.name.first_name, this.name.last_name].join(' ')
+})
+
+schema.set('toJSON', { virtuals: true });
+
 module.exports = mongoose.model('Commutersex', schema)

@@ -1,0 +1,36 @@
+<aside class="d-none d-md-block col-md-4 col-lg-3 col-xl-2 bg-dark" style="transition: transform 0.3s ease">
+  <nav class="position-sticky top-0">
+    <ul class="list-group">
+      <li class="list-group-item bg-dark d-flex justify-content-between justify-content-md-center align-items-center">
+        <h2 class="h4 text-light text-center p-4 m-0">Menu</h2>
+        <button type="button" class="btn text-light d-block d-md-none" id="btn-close-menu">
+          <i class="las la-times"></i>
+        </button>
+      </li>
+      <li class="list-group-item bg-dark">
+        <a href="/admin/dashboard" class="text-decoration-none btn {{ path in ['/admin', '/admin/dashboard'] ? 'btn-primary' : 'btn-dark' }} w-100 d-flex align-items-center text-start">
+          <i class="las la-home"></i>
+          <span class="ms-2">Dashboard</span>
+        </a>
+      </li>
+      <li class="list-group-item bg-dark">
+        <a href="/admin/commuters" class="text-decoration-none btn {{ path|indexOf('/admin/commuters') > -1 ? 'btn-primary' : 'btn-dark' }} w-100 d-flex align-items-center text-start">
+          <i class="las la-users"></i>
+          <span class="ms-2">Commuters</span>
+        </a>
+      </li>
+      <li class="list-group-item bg-dark">
+        <a href="/admin/drivers" class="text-decoration-none btn {{ path|indexOf('/admin/drivers') > -1 ? 'btn-primary' : 'btn-dark' }} w-100 d-flex align-items-center text-start">
+          <i class="las la-motorcycle"></i>
+          <span class="ms-2">Drivers</span>
+        </a>
+      </li>
+      <li class="list-group-item bg-dark">
+        <a href="/api/logout" class="text-decoration-none btn btn-dark w-100 d-flex align-items-center text-start">
+          <i class="las la-sign-out-alt"></i>
+          <span class="ms-2">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>

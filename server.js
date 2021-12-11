@@ -3,14 +3,21 @@ const session = require('express-session')
 const cookieParser = require('cookie-parser')
 const app = express()
 
+const axios = require('axios')
+const twig = require('twig')
+
 const { 
   COOKIE_SECRET, 
   PORT, 
   BASE_URL
 } = require('./config')
 
+axios.defaults.baseURL = BASE_URL
+
 // Require connection to the database
 require('./src/utils/database')
+
+require('./src/utils/twig')(twig);
 
 app.set('view engine', 'twig')
 
@@ -55,6 +62,9 @@ app.use((req, res, next) => {
     return messages[0]
   }
 
+  res.locals.path = req.path;
+  res.locals.originalUrl = req.originalUrl;
+
   next()
 })
 
@@ -64,11 +74,12 @@ app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json({ limit: '10mb' }))
 
-// Driver Routes
+// Admin Routes
+app.use('/admin', require('./src/routes/pages/admin/index.route'))
 
 // Client Routes
 
-// Admin Routes
+// Driver Routes
 
 // API Routes
 app.use('/api', require('./src/routes/api/api.route'))

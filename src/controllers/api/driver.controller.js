@@ -21,7 +21,7 @@ exports.read = async function(req, res) {
       $or: [
         { 'profile.name.first_name': new RegExp(q) },
         { 'profile.name.last_name': new RegExp(q) },
-        { 'account.username': new RegExp(q) }
+        { 'email': new RegExp(q) }
       ]
     })
       .select('-password')
@@ -155,10 +155,6 @@ exports.update = async function(req, res) {
 
     if (exists) {
       throw new Error('Email already exists.')
-    }
-
-    if (!driver.password && !req.body.password) {
-      throw new Error('Password is required.')
     }
 
     driver.set({

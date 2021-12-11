@@ -55,7 +55,10 @@ const schema = mongoose.Schema({
       required: true
     },
   },
-  email: String,
+  email: {
+    type: String,
+    required: true
+  },
   password: String,
   status: {
     type: String,
@@ -68,5 +71,11 @@ const schema = mongoose.Schema({
     updatedAt: 'updated_at'
   }
 })
+
+schema.virtual('full_name').get(function() {
+  return [this.profile.name.first_name, this.profile.name.last_name].join(' ')
+})
+
+schema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('Driver', schema)

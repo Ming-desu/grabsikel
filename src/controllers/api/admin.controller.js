@@ -21,7 +21,7 @@ exports.read = async function(req, res) {
       $or: [
         { 'name.first_name': new RegExp(q) },
         { 'name.last_name': new RegExp(q) },
-        { 'username': new RegExp(q) }
+        { 'email': new RegExp(q) }
       ]
     })
       .select('-password')

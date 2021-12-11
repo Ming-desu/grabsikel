@@ -102,6 +102,8 @@ exports.verifyToken = async function(req, res) {
         throw new Error('User does not exists.')
       }
 
+      sub.password = null
+
       sub = sub.toJSON()
     }
 

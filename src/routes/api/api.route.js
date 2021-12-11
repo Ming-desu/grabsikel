@@ -26,8 +26,8 @@ Router.use((req, res, next) => {
 
   next()
 })
-Router.use('/drivers', require('./api.driver.route'))
-Router.use('/commuters', require('./api.commuter.route'))
-Router.use('/admins', require('./api.admin.route'))
+Router.use('/drivers', require('./api.drivers.route'))
+Router.use('/commuters', require('./api.commuters.route'))
+Router.use('/admins', require('./api.admins.route'))
 
 module.exports = Router

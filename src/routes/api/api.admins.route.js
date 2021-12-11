@@ -1,7 +1,7 @@
 const express = require('express')
 const Router = express.Router()
 
-const controller = require('../../controllers/api/admin.controller')
+const controller = require('../../controllers/api/admins.controller')
 
 Router.route('')
   .get(controller.read)

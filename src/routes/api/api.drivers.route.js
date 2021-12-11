@@ -1,7 +1,7 @@
 const express = require('express')
 const Router = express.Router()
 
-const controller = require('../../controllers/api/commuter.controller')
+const controller = require('../../controllers/api/drivers.controller')
 
 Router.route('')
   .get(controller.read)

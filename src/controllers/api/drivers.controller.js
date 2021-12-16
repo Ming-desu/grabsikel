@@ -99,6 +99,17 @@ exports.store = async function(req, res) {
 
     driver.set(req.body)
 
+    if (req.body.password) {
+      const password_hash = bcrypt.hashSync(req.body.password, 10)
+
+      driver.password = password_hash
+    }
+    else {
+      const password_hash = bcrypt.hashSync("12345678", 10)
+
+      driver.password = password_hash
+    }
+
     await driver.save()
 
     res.status(200).json({

@@ -31,6 +31,10 @@ Router.use(async (req, res, next) => {
       })
     }
 
+    if (sub.type != 'driver') {
+      return res.redirect(`/${sub.type}`)
+    }
+
     res.locals.AUTHENTICATED_USER = sub
   }
   catch(err) {

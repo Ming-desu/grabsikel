@@ -1,0 +1,66 @@
+{% extends "base.twig" %}
+
+{% block title %}
+  Driver Login
+{% endblock %}
+
+{% block body %}
+  <div class="row justify-content-center py-5">
+    <h1 class="text-center mb-5">Driver Login</h1>
+    <div class="col-12 col-sm-11 col-md-10 col-lg-9 col-xl-7">
+      <div id="error"></div>
+      <div class="card overflow-hidden">
+        <div class="d-md-flex">
+          <div class="col-md-6 bg-success d-md-flex align-items-md-center">
+            <img src="/img/grabsikle_logo.png" class="img-fluid d-block mx-auto p-4" width="200" height="200" alt="Grabsikel Logo">
+          </div>
+          <div class="col-md-6">
+            <form action="/driver/auth/login" class="card-body p-4" method="POST">
+              <h2 class="h4 mb-4">Please log-in.</h2>
+              <div class="form-group mb-2">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="joesmith@domain.com">
+              </div>
+              <div class="form-group mb-4">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="********">
+              </div>
+              <div class="text-end">
+                <button type="submit" name="submit" class="btn btn-primary">Sign in</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form')
+
+      form?.addEventListener('submit', function(e) {
+        e.preventDefault()
+
+        const email = this.email.value;
+        const password = this.password.value;
+
+        if (!email || !password) {
+          return showError('Invalid username or password.')
+        }
+
+        this.submit.disabled = true
+
+        axios.post(this.action, {
+          email, password
+        })
+          .then(res => window.location.href = '/driver')
+          .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))
+
+        this.submit.disabled = false
+      })
+    })
+  </script>
+{% endblock %}

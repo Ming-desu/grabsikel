@@ -89,6 +89,7 @@ app.use('/admin', require('./src/routes/pages/admin/index.route'))
 // Client Routes
 
 // Driver Routes
+app.use('/driver', require('./src/routes/pages/driver/index.route'))
 
 // API Routes
 app.use('/api', require('./src/routes/api/api.route'))

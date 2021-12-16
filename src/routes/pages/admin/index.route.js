@@ -32,7 +32,7 @@ Router.use(async (req, res, next) => {
     }
 
     if (sub.type != 'admin') {
-      return res.redirect(`/${sub.type}`)
+      return res.redirect(`/${sub.type == 'commuter' ? '' : sub.type}`)
     }
 
     res.locals.AUTHENTICATED_USER = sub

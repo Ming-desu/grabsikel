@@ -31,14 +31,14 @@ Router.use(async (req, res, next) => {
       })
     }
 
-    if (sub.type != 'driver') {
-      return res.redirect(`/${sub.type == 'commuter' ? '' : sub.type}`)
+    if (sub.type != 'commuter') {
+      return res.redirect(`/${sub.type}`)
     }
 
     res.locals.AUTHENTICATED_USER = sub
   }
   catch(err) {
-    return res.redirect('/driver/auth')
+    return res.redirect('/auth')
   }
 
   next()
@@ -48,7 +48,7 @@ Router.use(async (req, res, next) => {
 // Router.use('/commuters', require('./commuters.route'))
 // Router.use('/drivers', require('./drivers.route'))
 // Router.use('/users', require('./users.route'))
-Router.get('', (req, res) => res.redirect('/driver/map'))
+Router.get('', (req, res) => res.redirect('/map'))
 Router.use('/map', require('./map.route'))
 Router.use('/profile', require('./profile.route'))
 

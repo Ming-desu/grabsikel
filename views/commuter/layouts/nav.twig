@@ -1,0 +1,35 @@
+<footer class="border-top border-2 bg-white" style="position: sticky; bottom: 0">
+  <nav class="d-flex justify-content-center">
+    <ul class="m-nav-footer">
+      <li class="{{ path in ['/', '/dashboard'] ? 'active' : '' }}">
+        <a href="/">
+          <i class="las la-home"></i>
+        </a>
+      </li>
+      <li class="{{ path|indexOf('/map') > -1 ? 'active' : '' }}">
+        <a href="/map">
+          <i class="las la-map"></i>
+        </a>
+      </li>
+      <li class="{{ path|indexOf('/profile') > -1 ? 'active' : '' }}">
+        <a href="/profile">
+          {% if AUTHENTICATED_USER.picture %}
+            <img src="/api/uploads/{{ AUTHENTICATED_USER.picture }}/?width=24&height=24" class="border {{ path|indexOf('/profile') > -1 ? 'border-primary' : '' }} rounded-circle" width="24" height="24" alt="">
+          {% else %}
+            <i class="las la-user"></i>
+          {% endif %}
+        </a>
+      </li>
+      <li class="{{ path|indexOf('/messages') > -1 ? 'active' : '' }}">
+        <a href="/messages">
+          <i class="las la-sms"></i>
+        </a>
+      </li>
+      <li>
+        <a href="/auth/logout">
+          <i class="las la-sign-out-alt"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>  
+</footer>

@@ -86,14 +86,13 @@ app.use((req, res, next) => {
 // Admin Routes
 app.use('/admin', require('./src/routes/pages/admin/index.route'))
 
-// Client Routes
-
 // Driver Routes
 app.use('/driver', require('./src/routes/pages/driver/index.route'))
 
 // API Routes
 app.use('/api', require('./src/routes/api/api.route'))
 
-app.get('/', (req, res) => res.send('Hello World'))
+// Client Routes
+app.use('/', require('./src/routes/pages/commuter/index.route'))
 
 app.listen(PORT, () => console.log(`${BASE_URL}`))

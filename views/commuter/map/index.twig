@@ -1,0 +1,161 @@
+{% extends "base.twig" %}
+
+{% block title %}
+  Map
+{% endblock %}
+
+{% block header %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.5.2/dist/esri-leaflet.js"
+    integrity="sha512-vC48cQq5LmjsPvqNIIoED0aUZ8POSJ0Z1mVexOqjVjAsJo32QUoT/2Do4kFKJjuPLIonpb/Hns7EqZ1LrlwSzw=="
+    crossorigin=""></script>
+
+  <!-- Load Esri Leaflet Geocoder from CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css"
+    integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g=="
+    crossorigin="">
+  
+  <script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js"
+    integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA=="
+    crossorigin=""></script>
+{% endblock %}
+
+{% block body %}
+  <div class="vh-100">
+    <div class="d-flex flex-column h-100">
+      {% include "commuter/layouts/header.twig" %}
+      <main class="flex-fill p-3">
+        <h1 class="h4 mb-4">Your Ride</h1>
+        <div id="error"></div>
+        <div class="card mb-4">
+          <p class="position-absolute top-50 start-50 translate-middle">
+            <i class="las la-spinner la-spin"></i>
+            Loading please wait...
+          </p>
+          <div id="map" style="height: 360px"></div>
+          <noscript>
+            Cannot load the map, please turn on JavaScript
+          </noscript>
+        </div>
+        <h2 class="h4 mb-4 text-center text-muted">Ride Details</h2>
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <img src="https://avatars.dicebear.com/api/adventurer/{{ time }}.svg?width=80&height=80" width="80" height="80" class="rounded border" alt="">
+              <div class="customer-details flex-fill ms-3">
+                <h5 class="card-title">John Doe Smith</h5>
+                <a href="tel:+639613454976" class="rounded-pill btn btn-sm btn-outline-secondary">
+                  <i class="las la-phone"></i>
+                  Call
+                </a>
+                <a href="" class="rounded-pill ms-2 btn btn-sm btn-outline-secondary">
+                  <i class="las la-sms"></i>
+                  Chat
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="card-body text-center">
+            <p class="m-0">
+              <i class="las la-map-marker"></i>
+              San Gabriel, San Pablo City, Laguna, 4000
+            </p>
+            <i class="las la-arrow-down"></i>
+            <p>
+              <i class="las la-map-marker"></i>
+              San Ignacio, San Pablo City, Laguna, 4000
+            </p>
+            <p class="m-0">
+              <small class="text-muted">
+                Approx. 25 mins.
+              </small>
+            </p>
+          </div>
+          <div class="card-footer d-flex justify-content-between">
+            <strong>Total Fare:</strong>
+            <strong>Php 123.00</strong>
+          </div>
+        </div>
+      </main>
+      {% include "commuter/layouts/nav.twig" %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script>
+    let coordinates = []
+    let map = null
+    document.addEventListener('DOMContentLoaded', () => {
+      const requestLocation = () => {
+        if (!'geolocation' in navigator) {
+          return showError('Your browser does not support geolocation, please update it and try again.')
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          pos => renderMap(pos.coords.latitude, pos.coords.longitude),    
+          () => showError('Could not retrieve your current location, please turn on your location and try again.')
+        )
+      }
+
+      const renderMap = (latitude, longitude) => {
+        if (typeof L != 'object') {
+          return
+        }
+
+        const geocodeService = L.esri.Geocoding.geocodeService();
+        const arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider({
+          countries: ['PH']
+        });
+
+        map = L.map(document.getElementById('map'))
+          .setView([latitude, longitude], 16);
+
+        L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: false,
+          maxZoom: 20,
+          minZoom: 13
+        }).addTo(map);
+
+        geocodeService.reverse().latlng([latitude, longitude]).run(function(error, result) {
+          if (error) {
+            return;
+          }
+
+          let { LongLabel } = result.address;
+
+          coordinates = [longitude, latitude];
+          address = LongLabel;
+
+          const currentLocationMarker = L.marker([latitude, longitude])
+            .bindPopup(`
+              ${LongLabel}
+            `)
+            .addTo(map)
+            .openPopup();
+
+          // if (!localStorage.getItem('toggle')) {
+          //   return;
+          // }
+
+          // if (localStorage.getItem('toggle') == 'true') {
+          //   document.getElementById('switch').checked = true;
+          //   socket.emit('active', coordinates, address);
+          // }
+        })
+      }
+
+      requestLocation()
+    })
+  </script>
+{% endblock %}

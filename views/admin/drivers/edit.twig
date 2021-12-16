@@ -38,9 +38,9 @@
                     <div class="form-group">
                       <label for="status" class="form-label">Approval Status</label>
                       <select name="status" id="status" class="form-select" required>
-                        <option value="pending" {{ driver.status == 'pending' ? 'checked' : '' }}>pending</option>
-                        <option value="accepted" {{ driver.status == 'accepted' ? 'checked' : '' }}>accepted</option>
-                        <option value="rejected" {{ driver.status == 'rejected' ? 'checked' : '' }}>rejected</option>
+                        <option value="pending" {{ driver.status == 'pending' ? 'selected' : '' }}>pending</option>
+                        <option value="accepted" {{ driver.status == 'accepted' ? 'selected' : '' }}>accepted</option>
+                        <option value="rejected" {{ driver.status == 'rejected' ? 'selected' : '' }}>rejected</option>
                       </select>
                     </div>
                   </div>

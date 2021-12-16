@@ -34,6 +34,10 @@ exports.login = async function(req, res) {
 
     if (type == 'driver') {
       user = await Driver.findOne({ email })
+
+      if (user.status != 'accepted') {
+        throw new Error('Account is not authorized to log in, please contact your administrator.')
+      }
     }
 
     if (!user || !password || !bcrypt.compareSync(password, user.password)) {

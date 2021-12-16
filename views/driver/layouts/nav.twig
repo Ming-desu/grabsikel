@@ -1,0 +1,35 @@
+<footer class="border-top border-2 bg-white" style="position: sticky; bottom: 0">
+  <nav class="d-flex justify-content-center">
+    <ul class="m-nav-footer">
+      <li class="{{ path in ['/driver', '/driver/dashboard'] ? 'active' : '' }}">
+        <a href="/driver">
+          <i class="las la-home"></i>
+        </a>
+      </li>
+      <li class="{{ path|indexOf('/driver/map') > -1 ? 'active' : '' }}">
+        <a href="/driver/map">
+          <i class="las la-map"></i>
+        </a>
+      </li>
+      <li class="{{ path|indexOf('/driver/profile') > -1 ? 'active' : '' }}">
+        <a href="/driver/profile">
+          {% if AUTHENTICATED_USER.profile.picture %}
+            <img src="/api/uploads/{{ AUTHENTICATED_USER.profile.picture }}/?width=24&height=24" class="border {{ path|indexOf('/driver/profile') > -1 ? 'border-primary' : '' }} rounded-circle" width="24" height="24" alt="">
+          {% else %}
+            <i class="las la-user"></i>
+          {% endif %}
+        </a>
+      </li>
+      <li class="{{ path|indexOf('/driver/messages') > -1 ? 'active' : '' }}">
+        <a href="/driver/messages">
+          <i class="las la-sms"></i>
+        </a>
+      </li>
+      <li>
+        <a href="/driver/auth/logout">
+          <i class="las la-sign-out-alt"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>  
+</footer>

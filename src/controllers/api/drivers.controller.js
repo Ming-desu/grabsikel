@@ -134,7 +134,11 @@ exports.update = async function(req, res) {
     }
 
     const { 
-      profile,
+      profile: {
+        name,
+        sex,
+        picture
+      },
       contact,
       vehicle,
       email
@@ -164,7 +168,11 @@ exports.update = async function(req, res) {
     }
 
     driver.set({
-      profile,
+      profile: {
+        ...driver.profile,
+        name,
+        sex
+      },
       contact,
       vehicle,
       email
@@ -180,13 +188,11 @@ exports.update = async function(req, res) {
       driver.password = password_hash
     }
 
-    await driver.save()
+    if (picture) {
+      driver.profile.picture = picture
+    }
 
-    res.json({
-      message: 'Successfully updated a driver.'
-    })
-
-    if (req.body.profile.picture) {
+    if (picture != null && prev_picture != null) {
       const chunks = prev_picture.split('.')
       chunks.pop()
 
@@ -206,8 +212,15 @@ exports.update = async function(req, res) {
         })
       })
     }  
+
+    await driver.save()
+
+    res.json({
+      message: 'Successfully updated a driver.'
+    })
   }
   catch(err) {
+    console.log(err)
     res.status(400).json({
       errors: [err.message]
     })

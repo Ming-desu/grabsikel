@@ -11,7 +11,7 @@
   <div class="dropdown d-none d-md-block">
     <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
       {% if AUTHENTICATED_USER.picture %}
-        <img src="/uploads/{{ AUTHENTICATED_USER.picture }}" width="35" height="35" alt="{{ AUTHENTICATED_USER.full_name }} picture" class="rounded-circle border">
+        <img src="/api/uploads/{{ AUTHENTICATED_USER.picture }}?width=35&height=35" width="35" height="35" alt="{{ AUTHENTICATED_USER.full_name }} picture" class="rounded-circle border">
       {% else %}
         <img src="https://avatars.dicebear.com/api/initials/{{ AUTHENTICATED_USER.full_name }}.svg?size=30" width="35" height="35" class="rounded-circle border" alt="{{ AUTHENTICATED_USER.full_name }} initials">
       {% endif %}

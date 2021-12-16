@@ -42,7 +42,7 @@
                     </div>
                     <div class="form-group mb-3">
                       <label for="picture" class="form-label">Profile picture</label>
-                      <input class="form-control" type="file" name="picture" id="picture">
+                      <input class="form-control" type="file" name="picture" id="picture" accept=".jpg,.png">
                     </div>
                   </div>
                 </div>
@@ -97,7 +97,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.forms.form_edit
 
-      form.addEventListener('submit', function(e) {
+      form.addEventListener('submit', async function(e) {
         e.preventDefault()
 
         const _id = this._id.value
@@ -111,6 +111,24 @@
           return showError('Please fill out the required fields.')
         }
         
+        let picture = null
+
+        if (this.picture.files.length > 0) {
+          const file = this.picture.files[0]
+          const extension = file.name.split('.').pop()
+
+          if (['jpg', 'png'].indexOf(extension.toLowerCase()) == -1) {
+            return showError('Please select an image with the following format .jpg or .png.')
+          }
+
+          const formData = new FormData()
+          formData.set('picture', file)
+
+          const { data: { path } } = await axios.post('/api/uploads', formData) 
+
+          picture = path
+        }
+        
         this.submit.disabled = true
 
         axios.patch(this.action, {
@@ -121,7 +139,8 @@
             last_name
           },
           sex,
-          email
+          email,
+          picture
         })
           .then(res => window.location.href = '/admin/users')
           .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))

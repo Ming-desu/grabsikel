@@ -2,8 +2,12 @@ const { Request, Response } = require('express')
 const schema = require('../../validators/admin.validator')
 const { getErrors } = require('../../utils/joi.helper')
 const bcrypt = require('bcrypt')
+const glob = require('glob')
+const fs = require('fs')
+const path = require('path')
 
 const Admin = require('../../models/Admin')
+const { ROOT_DIR } = require('../../../config')
 
 /**
  * Reads admin information from the database
@@ -131,10 +135,13 @@ exports.update = async function(req, res) {
     const { 
       name,
       sex,
-      email
+      email,
+      picture
     } = req.body
 
     const admin = await Admin.findById(req.body._id)
+
+    const prev_picture = admin.picture
 
     if (!admin) {
       throw new Error('Admin does not exists.')
@@ -158,19 +165,36 @@ exports.update = async function(req, res) {
     admin.set({
       name,
       sex,
-      email
+      email,
+      picture
     })
-
-    // TODO :: Update with file upload handling ...
-    if (req.body.picture) {
-      admin.picture = req.body.picture
-    }
 
     if (req.body.password) {
       const password_hash = bcrypt.hashSync(req.body.password, 10)
 
       admin.password = password_hash
     }
+
+    if (req.body.picture && prev_picture) {
+      const chunks = prev_picture.split('.')
+      chunks.pop()
+
+      const pattern = `${chunks.join('.')}*`
+
+      glob(pattern, {
+        cwd: path.join(ROOT_DIR, 'public/uploads')
+      }, (err, files) => {
+        if (err) {
+          return
+        }
+
+        files.forEach(file => {
+          if (fs.existsSync(path.join(ROOT_DIR, 'public/uploads', file))) {
+            fs.unlinkSync(path.join(ROOT_DIR, 'public/uploads', file))
+          }
+        })
+      })
+    }  
 
     await admin.save()
 
@@ -203,6 +227,27 @@ exports.delete = async function(req, res) {
 
     if (!admin) {
       throw new Error('Admin does not exists.')
+    }
+
+    if (admin.picture) {
+      const chunks = admin.picture.split('.')
+      chunks.pop()
+
+      const pattern = `${chunks.join('.')}*`
+
+      glob(pattern, {
+        cwd: path.join(ROOT_DIR, 'public/uploads')
+      }, (err, files) => {
+        if (err) {
+          return
+        }
+
+        files.forEach(file => {
+          if (fs.existsSync(path.join(ROOT_DIR, 'public/uploads', file))) {
+            fs.unlinkSync(path.join(ROOT_DIR, 'public/uploads', file))
+          }
+        })
+      })
     }
 
     await admin.delete()

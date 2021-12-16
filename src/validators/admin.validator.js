@@ -8,7 +8,7 @@ const schema = Joi.object().keys({
     last_name: Joi.string().max(255).required().label('Last name')
   }),
   sex: Joi.string().required().label('Sex'),
-  picture: Joi.string().label('Picture'),
+  picture: Joi.string().allow(null).label('Picture'),
   email: Joi.string().email().label('Email'),
   password: Joi.string().min(8).label('Password')
 })

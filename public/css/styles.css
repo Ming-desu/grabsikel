@@ -71,3 +71,16 @@ body {
   font-size: .75rem;
   font-weight: 700;
 }
+
+.btn-square {
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-floating {
+  margin: 0 1rem 5.5rem 0;
+}

@@ -26,7 +26,7 @@ const schema = Joi.object().keys({
     license_number: Joi.string().required().label('License number')
   }),
   email: Joi.string().email().required().label('Email'),
-  password: Joi.string().min(8).label('Password'),
+  password: Joi.string().allow(null).min(8).label('Password'),
   status: Joi.string().default('pending').label('Status')
 })
 

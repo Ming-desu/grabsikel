@@ -109,13 +109,12 @@ exports.verifyToken = async function(req, res) {
       sub.password = null
 
       sub = sub.toJSON()
+
+      sub.type = type
     }
 
     const new_token = jwt.sign({
-      sub: {
-        ...sub,
-        type
-      }
+      sub
     }, JWT_SECRET, {
       expiresIn: '7d'
     })

@@ -10,7 +10,7 @@ const schema = Joi.object().keys({
   sex: Joi.string().required().label('Sex'),
   picture: Joi.string().allow(null).label('Picture'),
   email: Joi.string().email().label('Email'),
-  password: Joi.string().min(8).label('Password')
+  password: Joi.string().allow(null).min(8).label('Password')
 })
 
 module.exports = schema

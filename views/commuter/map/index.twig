@@ -86,6 +86,54 @@
           </div>
         </div>
       </main>
+      <div class="position-fixed bottom-0 end-0 pe-none" style="z-index: 1000">
+        <a href="#bookModal" role="button" class="btn btn-primary rounded-circle btn-square fs-3 shadow pe-auto btn-floating" data-bs-toggle="modal" title="Book a ride">
+          <i class="las la-book"></i>
+        </a>
+      </div>
+      <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="bookModalLabel">Book ride</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="">
+              <input type="hidden" name="source_latitude">
+              <input type="hidden" name="source_longitude">
+              <input type="hidden" name="source_text">
+              <input type="hidden" name="destination_latitude">
+              <input type="hidden" name="destination_longitude">
+              <input type="hidden" name="destination_text">
+
+              <div class="modal-body">
+                <h6 class="card-title">Your destination</h6>
+                <p class="card-text text-muted">
+                  Pin the location in the map where the driver will drop you off.
+                </p>
+                <div class="card mb-4">
+                  <p class="position-absolute top-50 start-50 translate-middle">
+                    <i class="las la-spinner la-spin"></i>
+                    Loading please wait...
+                  </p>
+                  <div id="map-book" style="height: 360px"></div>
+                  <noscript>
+                    Cannot load the map, please turn on JavaScript
+                  </noscript>
+                </div>
+                <div class="form-floating">
+                  <textarea class="form-control" placeholder="Directions" id="directions"></textarea>
+                  <label for="directions">Directions</label>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn text-muted" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Book ride</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
       {% include "commuter/layouts/nav.twig" %}
     </div>
   </div>
@@ -93,31 +141,61 @@
 
 {% block footer %}
   <script>
-    let coordinates = []
-    let map = null
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      let coordinates = []
+      let map = null
+      let bookMap = null
+      
+      const geocodeService = L.esri.Geocoding.geocodeService();
+      
       const requestLocation = () => {
-        if (!'geolocation' in navigator) {
-          return showError('Your browser does not support geolocation, please update it and try again.')
-        }
+        return new Promise((resolve, reject) => {
+          if (!'geolocation' in navigator) {
+            reject(new Error('Your browser does not support geolocation, please update it and try again.'))
+            // showError('Your browser does not support geolocation, please update it and try again.')
+          }
 
-        navigator.geolocation.getCurrentPosition(
-          pos => renderMap(pos.coords.latitude, pos.coords.longitude),    
-          () => showError('Could not retrieve your current location, please turn on your location and try again.')
-        )
+          navigator.geolocation.getCurrentPosition(
+            pos => {
+              // map = renderMap(pos.coords.latitude, pos.coords.longitude)
+              const { latitude, longitude } = pos.coords
+
+              geocodeService.reverse().latlng([latitude, longitude]).run(function(error, result) {
+                if (error) {
+                  reject(error)
+                  return;
+                }
+
+                resolve({
+                  latitude,
+                  longitude,
+                  text: result.address.LongLabel
+                })
+
+                // if (!localStorage.getItem('toggle')) {
+                //   return;
+                // }
+
+                // if (localStorage.getItem('toggle') == 'true') {
+                //   document.getElementById('switch').checked = true;
+                //   socket.emit('active', coordinates, address);
+                // }
+              })
+            },    
+            () => {
+              reject(new Error('Could not retrieve your current location, please turn on your location and try again.'))
+              // showError('Could not retrieve your current location, please turn on your location and try again.')
+            }
+          )
+        })
       }
 
-      const renderMap = (latitude, longitude) => {
+      const renderMap = (latitude, longitude, text, id = 'map') => {
         if (typeof L != 'object') {
           return
         }
 
-        const geocodeService = L.esri.Geocoding.geocodeService();
-        const arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider({
-          countries: ['PH']
-        });
-
-        map = L.map(document.getElementById('map'))
+        const map = L.map(document.getElementById(id))
           .setView([latitude, longitude], 16);
 
         L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
@@ -127,35 +205,101 @@
           minZoom: 13
         }).addTo(map);
 
-        geocodeService.reverse().latlng([latitude, longitude]).run(function(error, result) {
-          if (error) {
-            return;
+        L.marker([latitude, longitude])
+          .bindPopup(`
+            ${text}
+          `)
+          .addTo(map)
+          .openPopup();
+
+        return map
+      }
+
+      const initializeBookMap = (latitude, longitude, text) => {
+        const modalDOM = document.getElementById('bookModal')
+        const modal = new bootstrap.Modal(modalDOM)
+        const form = modalDOM.querySelector('form')
+
+        modalDOM?.addEventListener('shown.bs.modal', function(e) {
+          if (!bookMap) {
+            bookMap = renderMap(latitude, longitude, text, 'map-book') 
+            addGeoSearch(bookMap, L.marker(), form)
           }
+        })
 
-          let { LongLabel } = result.address;
+        form.source_latitude.value = latitude
+        form.source_longitude.value = longitude
+        form.source_text.value = text
 
-          coordinates = [longitude, latitude];
-          address = LongLabel;
-
-          const currentLocationMarker = L.marker([latitude, longitude])
-            .bindPopup(`
-              ${LongLabel}
-            `)
-            .addTo(map)
-            .openPopup();
-
-          // if (!localStorage.getItem('toggle')) {
-          //   return;
-          // }
-
-          // if (localStorage.getItem('toggle') == 'true') {
-          //   document.getElementById('switch').checked = true;
-          //   socket.emit('active', coordinates, address);
-          // }
+        form?.addEventListener('submit', function(e) {
+          e.preventDefault()
         })
       }
 
-      requestLocation()
+      const addGeoSearch = (map, marker, form) => {
+        const arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider({
+          countries: ['PH']
+        })
+
+        const geoSearch = L.esri.Geocoding.geosearch({
+          title: '',
+          placeholder: 'Search your destination...',
+          useMapBounds: false,
+          providers: [
+            arcgisOnline
+          ]
+        }).addTo(map)
+
+        const setDestinationMarker = (lat, lng, text) => {
+          form.destination_latitude.value = lat
+          form.destination_longitude.value = lng
+          form.destination_text.value = text
+
+          marker.setLatLng([lat, lng])
+            .bindPopup(`
+              ${text}
+            `)
+            .addTo(map)
+            .openPopup()
+        }
+
+        map.on('click', function(e) {
+          geocodeService.reverse().latlng(e.latlng).run(function(error, result) {
+            if (error) {
+              return
+            }
+
+            const { LongLabel: text } = result.address
+            const { lat, lng } = e.latlng
+
+            setDestinationMarker(lat, lng, text)
+          })
+        })
+
+        geoSearch.addEventListener('results', function(e) {
+          if (e.results.length <= 0) {
+            return;
+          }
+          
+          const result = e.results[0];
+          const { lat, lng } = result.latlng
+          const text = result.text
+
+          setDestinationMarker(lat, lng, text)
+        })
+      }
+
+      try {
+        const { latitude, longitude, text } = await requestLocation()
+        coordinates = [longitude, latitude]
+
+        map = renderMap(latitude, longitude, text)
+
+        initializeBookMap(latitude, longitude, text)
+      }
+      catch(err) {
+        showError(err.message)
+      }
     })
   </script>
 {% endblock %}

@@ -29,6 +29,8 @@ app.set('twig options', {
   strict_variables: false
 })
 
+app.use(require('morgan')('tiny'))
+
 // Use express session middleware
 app.use(session({
   resave: false,

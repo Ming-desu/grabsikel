@@ -98,7 +98,8 @@
               <h5 class="modal-title" id="bookModalLabel">Book ride</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="">
+            <form action="/map/book" method="POST">
+              <input type="hidden" name="_id" value="{{ AUTHENTICATED_USER._id }}">
               <input type="hidden" name="source_latitude">
               <input type="hidden" name="source_longitude">
               <input type="hidden" name="source_text">
@@ -107,6 +108,7 @@
               <input type="hidden" name="destination_text">
 
               <div class="modal-body">
+                <div id="error-book"></div>
                 <h6 class="card-title">Your destination</h6>
                 <p class="card-text text-muted">
                   Pin the location in the map where the driver will drop you off.
@@ -128,7 +130,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn text-muted" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Book ride</button>
+                <button type="submit" name="submit" class="btn btn-primary">Book ride</button>
               </div>
             </form>
           </div>
@@ -233,6 +235,38 @@
 
         form?.addEventListener('submit', function(e) {
           e.preventDefault()
+
+          const _id = this._id.value
+          const source_latitude = this.source_latitude.value
+          const source_longitude = this.source_longitude.value
+          const source_text = this.source_text.value
+          const destination_latitude = this.destination_latitude.value
+          const destination_longitude = this.destination_longitude.value
+          const destination_text = this.destination_text.value
+          const directions = this.directions.value
+
+          if (!source_latitude || !source_longitude || !destination_latitude || !destination_longitude) {
+            return showError('Please select your destination.', 'error-book')
+          }
+
+          this.submit.disabled = true
+
+          axios.post(this.action, {
+            source: {
+              coordinates: [parseFloat(source_longitude), parseFloat(source_latitude)],
+              text: source_text
+            },
+            destination: {
+              coordinates: [parseFloat(destination_longitude), parseFloat(destination_latitude)],
+              text: destination_text
+            },
+            directions,
+            _id
+          })
+            .then(res => console.log(res.data)/*window.location.reload()*/)
+            .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))
+
+          this.submit.disabled = false
         })
       }
 

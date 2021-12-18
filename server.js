@@ -4,6 +4,13 @@ const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 const path = require('path')
 const app = express()
+const { createServer } = require('http')
+const { Server } = require('socket.io')
+
+const httpServer = createServer(app)
+const io = new Server(httpServer, {
+  path: '/ws',
+})
 
 const axios = require('axios')
 const twig = require('twig')
@@ -20,7 +27,7 @@ axios.defaults.baseURL = BASE_URL
 // Require connection to the database
 require('./src/utils/database')
 
-require('./src/utils/twig')(twig);
+require('./src/utils/twig')(twig)
 
 app.set('view engine', 'twig')
 
@@ -29,7 +36,7 @@ app.set('twig options', {
   strict_variables: false
 })
 
-app.use(require('morgan')('tiny'))
+// app.use(require('morgan')('tiny'))
 
 // Use express session middleware
 app.use(session({
@@ -49,6 +56,8 @@ app.use(fileUpload({
   useTempFiles: true,
   tempFileDir: path.resolve(ROOT_DIR, '/tmp')
 }))
+
+// app.response.io = () => io
 
 // Create a custom error handler in session
 app.response.message = function(message, type = 'notification') {
@@ -97,4 +106,7 @@ app.use('/api', require('./src/routes/api/api.route'))
 // Client Routes
 app.use('/', require('./src/routes/pages/commuter/index.route'))
 
-app.listen(PORT, () => console.log(`${BASE_URL}`))
+// Require socket io helper
+require('./src/utils/ws')(io)
+
+httpServer.listen(PORT, () => console.log(`${BASE_URL}`))

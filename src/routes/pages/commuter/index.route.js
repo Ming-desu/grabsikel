@@ -60,8 +60,6 @@ Router.use(async (req, res, next) => {
   })
     .populate('driver')
 
-  console.log(res.locals.CURRENT_BOOK)
-
   next()
 })
 

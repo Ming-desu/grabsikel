@@ -44,6 +44,27 @@ Router.use(async (req, res, next) => {
   next()
 })
 
+const Book = require('../../../models/Book')
+const moment = require('moment')
+
+Router.use(async (req, res, next) => {
+  res.locals.CURRENT_BOOK = await Book.findOne({
+    commuter: res.locals.AUTHENTICATED_USER._id,
+    created_at: {
+      $gt: moment().subtract(1, 'day').endOf('day').toDate(),
+      $lt: moment().add(1, 'day').startOf('day').toDate()
+    },
+    status: {
+      $in: ['pending', 'accepted']
+    }
+  })
+    .populate('driver')
+
+  console.log(res.locals.CURRENT_BOOK)
+
+  next()
+})
+
 // Router.get('', (req, res) => res.redirect('/driver/commuters'))
 // Router.use('/commuters', require('./commuters.route'))
 // Router.use('/drivers', require('./drivers.route'))

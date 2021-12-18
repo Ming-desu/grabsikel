@@ -23,11 +23,30 @@ exports.store = async function(req, res) {
       source,
       destination,
       directions,
+      distance,
+      duration,
+      fare,
       _id
     } = req.body
 
-    const { data: { distance, duration, fare } } = await axios.post('/api/ors/matrix', {
-      locations: [source.coordinates, destination.coordinates]
+    // const { data: { distance, duration, fare } } = await axios.post('/api/ors/matrix', {
+    //   locations: [source.coordinates, destination.coordinates]
+    // })
+
+    const { data: { message } } = await axios.post('/api/books', {
+      ride: {
+        source,
+        destination,
+        directions,
+        fare,
+        distance,
+        duration
+      },
+      commuter: _id
+    }, {
+      headers: {
+        'Authorization': `Bearer ${req.cookies.token}`
+      }
     })
 
     res.json({

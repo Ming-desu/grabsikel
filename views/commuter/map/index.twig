@@ -45,69 +45,82 @@
             Cannot load the map, please turn on JavaScript
           </noscript>
         </div>
-        <h2 class="h4 mb-4 text-center text-muted">Ride Details</h2>
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <img src="https://avatars.dicebear.com/api/adventurer/{{ time }}.svg?width=80&height=80" width="80" height="80" class="rounded border" alt="">
-              <div class="customer-details flex-fill ms-3">
-                <h5 class="card-title">John Doe Smith</h5>
-                <a href="tel:+639613454976" class="rounded-pill btn btn-sm btn-outline-secondary">
-                  <i class="las la-phone"></i>
-                  Call
-                </a>
-                <a href="" class="rounded-pill ms-2 btn btn-sm btn-outline-secondary">
-                  <i class="las la-sms"></i>
-                  Chat
-                </a>
-              </div>
+        {% if CURRENT_BOOK %}
+          <h2 class="h4 mb-4 text-center text-muted">Ride Details</h2>
+          <div class="card">
+            <div class="card-body">
+              {% if CURRENT_BOOK.driver %}
+                <div class="d-flex align-items-center">
+                  {% if CURRENT_BOOK.driver.profile.picture %}
+                    <img src="/api/uploads/{{ CURRENT_BOOK.driver.profile.picture }}?width=80&height=80" width="80" height="80" class="rounded border" alt="">
+                  {% else %}
+                    <img src="https://avatars.dicebear.com/api/initials/{{ CURRENT_BOOK.driver.full_name }}.svg?width=80&height=80" width="80" height="80" class="rounded border" alt="">
+                  {% endif %}
+                  <div class="customer-details flex-fill ms-3">
+                    <h5 class="card-title">{{ CURRENT_BOOK.driver.full_name }}</h5>
+                    <a href="tel:{{ CURRENT_BOOK.driver.contact.number }}" class="rounded-pill btn btn-sm btn-outline-secondary">
+                      <i class="las la-phone"></i>
+                      Call
+                    </a>
+                    <a href="" class="rounded-pill ms-2 btn btn-sm btn-outline-secondary">
+                      <i class="las la-sms"></i>
+                      Chat
+                    </a>
+                  </div>
+                </div>
+              {% else %}
+                <strong>Waiting for driver to accept your ride...</strong>
+              {% endif %}
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="card-body text-center">
+              <p class="m-0">
+                <i class="las la-map-marker"></i>
+                {{ CURRENT_BOOK.ride.source.text }}
+              </p>
+              <i class="las la-arrow-down"></i>
+              <p>
+                <i class="las la-map-marker"></i>
+                {{ CURRENT_BOOK.ride.destination.text }}
+              </p>
+              <p class="m-0">
+                <small class="text-muted">
+                  {{ CURRENT_BOOK.ride.duration|format_duration }} {{ CURRENT_BOOK.ride.distance|format_distance }}
+                </small>
+              </p>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+              <strong>Total Fare:</strong>
+              <strong>{{ CURRENT_BOOK.ride.fare|format_fare }}</strong>
             </div>
           </div>
-          <div class="dropdown-divider"></div>
-          <div class="card-body text-center">
-            <p class="m-0">
-              <i class="las la-map-marker"></i>
-              San Gabriel, San Pablo City, Laguna, 4000
-            </p>
-            <i class="las la-arrow-down"></i>
-            <p>
-              <i class="las la-map-marker"></i>
-              San Ignacio, San Pablo City, Laguna, 4000
-            </p>
-            <p class="m-0">
-              <small class="text-muted">
-                Approx. 25 mins.
-              </small>
-            </p>
-          </div>
-          <div class="card-footer d-flex justify-content-between">
-            <strong>Total Fare:</strong>
-            <strong>Php 123.00</strong>
-          </div>
-        </div>
+        {% endif %}
       </main>
-      <div class="position-fixed bottom-0 end-0 pe-none" style="z-index: 1000">
-        <a href="#bookModal" role="button" class="btn btn-primary rounded-circle btn-square fs-3 shadow pe-auto btn-floating" data-bs-toggle="modal" title="Book a ride">
-          <i class="las la-book"></i>
-        </a>
-      </div>
-      <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="bookModalLabel">Book ride</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="/map/book" method="POST">
-              <input type="hidden" name="_id" value="{{ AUTHENTICATED_USER._id }}">
-              <input type="hidden" name="source_latitude">
-              <input type="hidden" name="source_longitude">
-              <input type="hidden" name="source_text">
-              <input type="hidden" name="destination_latitude">
-              <input type="hidden" name="destination_longitude">
-              <input type="hidden" name="destination_text">
-
+      {% if not CURRENT_BOOK %}
+        <div class="position-fixed bottom-0 end-0 pe-none" style="z-index: 1000">
+          <a href="#bookModal" role="button" class="btn btn-primary rounded-circle btn-square fs-3 shadow pe-auto btn-floating" data-bs-toggle="modal" title="Book a ride">
+            <i class="las la-book"></i>
+          </a>
+        </div>
+        <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <form action="/map/book" class="modal-content" method="POST">
+              <div class="modal-header">
+                <h5 class="modal-title" id="bookModalLabel">Book ride</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
               <div class="modal-body">
+                <input type="hidden" name="_id" value="{{ AUTHENTICATED_USER._id }}">
+                <input type="hidden" name="source_latitude">
+                <input type="hidden" name="source_longitude">
+                <input type="hidden" name="source_text">
+                <input type="hidden" name="destination_latitude">
+                <input type="hidden" name="destination_longitude">
+                <input type="hidden" name="destination_text">
+                <input type="hidden" name="duration">
+                <input type="hidden" name="distance">
+                <input type="hidden" name="fare">
+
                 <div id="error-book"></div>
                 <h6 class="card-title">Your destination</h6>
                 <p class="card-text text-muted">
@@ -127,6 +140,27 @@
                   <textarea class="form-control" placeholder="Directions" id="directions"></textarea>
                   <label for="directions">Directions</label>
                 </div>
+                <div id="book-modal-details" class="d-none mt-4">
+                  <div class="dropdown-divider"></div>
+                  <div class="card-body text-center">
+                    <p class="m-0">
+                      <i class="las la-map-marker"></i>
+                      <span class="book-source-label"></span>
+                    </p>
+                    <i class="las la-arrow-down"></i>
+                    <p>
+                      <i class="las la-map-marker"></i>
+                      <span class="book-destination-label"></span>
+                    </p>
+                    <p class="m-0">
+                      <small class="text-muted book-duration-label"></small>
+                    </p>
+                  </div>
+                  <div class="card-footer d-flex justify-content-between">
+                    <strong>Total Fare:</strong>
+                    <strong class="book-fare-label"></strong>
+                  </div>
+                </div>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn text-muted" data-bs-dismiss="modal">Cancel</button>
@@ -135,7 +169,7 @@
             </form>
           </div>
         </div>
-      </div>
+      {% endif %}
       {% include "commuter/layouts/nav.twig" %}
     </div>
   </div>
@@ -219,6 +253,11 @@
 
       const initializeBookMap = (latitude, longitude, text) => {
         const modalDOM = document.getElementById('bookModal')
+
+        if (!modalDOM) {
+          return
+        }
+
         const modal = new bootstrap.Modal(modalDOM)
         const form = modalDOM.querySelector('form')
 
@@ -244,6 +283,9 @@
           const destination_longitude = this.destination_longitude.value
           const destination_text = this.destination_text.value
           const directions = this.directions.value
+          const distance = this.distance.value
+          const duration = this.duration.value
+          const fare = this.fare.value
 
           if (!source_latitude || !source_longitude || !destination_latitude || !destination_longitude) {
             return showError('Please select your destination.', 'error-book')
@@ -261,10 +303,13 @@
               text: destination_text
             },
             directions,
+            distance,
+            duration,
+            fare,
             _id
           })
-            .then(res => console.log(res.data)/*window.location.reload()*/)
-            .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))
+            .then(res => window.location.reload())
+            .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0], 'error-book'))
 
           this.submit.disabled = false
         })
@@ -295,6 +340,33 @@
             `)
             .addTo(map)
             .openPopup()
+
+          axios.post('/api/ors/matrix', {
+            locations: [
+              [parseFloat(form.source_longitude.value), parseFloat(form.source_latitude.value)],
+              [parseFloat(lng), parseFloat(lat)]
+            ]
+          })
+            .then(res => {
+              const formatter = new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2
+              })
+
+              const { distance, duration, fare } = res.data
+              const details = document.getElementById('book-modal-details')
+
+              details.querySelector('.book-source-label').innerText = form.source_text.value
+              details.querySelector('.book-destination-label').innerText = form.destination_text.value
+              details.querySelector('.book-duration-label').innerText = `Approx. ${Math.ceil(duration / 60)} mins. (${Math.ceil(distance)} km)`
+              details.querySelector('.book-fare-label').innerText = `Php ${formatter.format(parseFloat(fare))}`
+
+              details.classList.remove('d-none')
+
+              form.distance.value = distance
+              form.duration.value = duration
+              form.fare.value = fare
+            })
+            .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0], 'error-book'))
         }
 
         map.on('click', function(e) {

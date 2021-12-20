@@ -43,3 +43,37 @@ exports.matrix = async function(req, res) {
     })
   }
 }
+
+/**
+ * Gets direction 
+ * 
+ * @param {Request} req 
+ * @param {Response} res 
+ */
+exports.directions = async function(req, res) {
+  try {
+    const { coordinates } = req.body
+
+    if (coordinates.length < 2) {
+      throw new Error('Locations provided should be an array of coordinates and at least have 2 items. Format: [[source_longitude, source, latitude], [destination_longitude, destination_latitude]]')
+    }
+
+    const { data } = await axios.post('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
+      coordinates
+    }, {
+      headers: {
+        Authorization: ORS_SECRET
+      }
+    })
+
+    res.json({
+      message: 'ok',
+      geoJSON: data
+    })
+  }
+  catch(err) {
+    res.status(400).json({
+      errors: [err.message]
+    })
+  }
+}

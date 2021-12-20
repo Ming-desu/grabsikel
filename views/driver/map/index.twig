@@ -1,4 +1,4 @@
-{% extends "base.twig" %}
+{% extends "driver/layouts/main.twig" %}
 
 {% block title %}
   Driver Map
@@ -51,49 +51,108 @@
             Cannot load the map, please turn on JavaScript
           </noscript>
         </div>
-        <h2 class="h4 mb-4 text-center text-muted">Ride Details</h2>
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <img src="https://avatars.dicebear.com/api/adventurer/{{ time }}.svg?width=80&height=80" width="80" height="80" class="rounded border" alt="">
-              <div class="customer-details flex-fill ms-3">
-                <h5 class="card-title">John Doe Smith</h5>
-                <div class="d-flex justify-content-between">
-                  <div>
-                    <a href="tel:+639613454976" class="rounded-pill btn btn-sm btn-outline-secondary">
-                      <i class="las la-phone"></i>
-                      Call
-                    </a>
-                    <a href="" class="rounded-pill ms-2 btn btn-sm btn-outline-secondary">
-                      <i class="las la-sms"></i>
-                      Chat
-                    </a>
+
+        {% if CURRENT_BOOK %}
+          <h2 class="h4 mb-4 text-center text-muted">Ride Details</h2>
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                {% if CURRENT_BOOK.commuter.picture %}
+                  <img src="/api/uploads/{{ CURRENT_BOOK.commuter.picture }}?width=80&height=80" width="80" height="80" class="rounded border" alt="">
+                {% else %}
+                    <img src="https://avatars.dicebear.com/api/initials/{{ CURRENT_BOOK.commuter.full_name }}.svg?width=80&height=80" width="80" height="80" class="rounded border" alt="">
+                {% endif %}
+                <div class="customer-details flex-fill ms-3">
+                  <h5 class="card-title">{{ CURRENT_BOOK.commuter.full_name }}</h5>
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <a href="tel:{{ CURRENT_BOOK.commuter.contact_number }}" class="rounded-pill btn btn-sm btn-outline-secondary">
+                        <i class="las la-phone"></i>
+                        Call
+                      </a>
+                      <a href="" class="rounded-pill ms-2 btn btn-sm btn-outline-secondary">
+                        <i class="las la-sms"></i>
+                        Chat
+                      </a>
+                    </div>
+                    <div>
+                      <a href="#" role="button" id="btn-here" class="rounded-pill btn btn-sm btn-primary">I'm here</a>                
+                      <a href="#" role="button" id="btn-done" class="rounded-pill btn btn-sm btn-success">Drop off</a>
+                    </div>
                   </div>
-                  <a href="" class="rounded-pill btn btn-sm btn-primary">I'm here</a>
                 </div>
               </div>
             </div>
+            <div class="dropdown-divider"></div>
+            <div class="card-body text-center">
+              <p class="m-0">
+                <i class="las la-map-marker"></i>
+                {{ CURRENT_BOOK.ride.source.text }}
+              </p>
+              <i class="las la-arrow-down"></i>
+              <p>
+                <i class="las la-map-marker"></i>
+                {{ CURRENT_BOOK.ride.destination.text }}
+              </p>
+              <p class="m-0">
+                <small class="text-muted">
+                  {{ CURRENT_BOOK.ride.duration|format_duration }} {{ CURRENT_BOOK.ride.distance|format_distance }}
+                </small>
+              </p>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+              <strong>Total Fare:</strong>
+              <strong>{{ CURRENT_BOOK.ride.fare|format_fare }}</strong>
+            </div>
           </div>
-          <div class="dropdown-divider"></div>
-          <div class="card-body text-center">
-            <p class="m-0">
-              <i class="las la-map-marker"></i>
-              San Gabriel, San Pablo City, Laguna, 4000
-            </p>
-            <i class="las la-arrow-down"></i>
-            <p>
-              <i class="las la-map-marker"></i>
-              San Ignacio, San Pablo City, Laguna, 4000
-            </p>
-            <p class="m-0">
-              <small class="text-muted">
-                Approx. 25 mins.
-              </small>
-            </p>
-          </div>
-          <div class="card-footer d-flex justify-content-between">
-            <strong>Total Fare:</strong>
-            <strong>Php 123.00</strong>
+        {% endif %}
+
+        <button type="button" class="d-none" data-bs-toggle="modal" data-bs-target="#promptModal" id="promptButton"></button>
+        <div class="modal fade" id="promptModal" tabindex="-1" aria-labelledby="promptModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="promptModalLabel">Ride Details</h5>
+                <button type="button" class="btn-close prompt-reject-button" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <img src="" class="prompt-commuter-image" width="80" height="80" class="rounded border" alt="">
+                    <div class="customer-details flex-fill ms-3">
+                      <h5 class="card-title prompt-commuter-name"></h5>
+                      <a href="tel:" class="prompt-commuter-contact rounded-pill btn btn-sm btn-outline-secondary">
+                        <i class="las la-phone"></i>
+                        Call
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="card-body text-center">
+                  <p class="m-0">
+                    <i class="las la-map-marker"></i>
+                    <span class="prompt-source-label"></span>
+                  </p>
+                  <i class="las la-arrow-down"></i>
+                  <p>
+                    <i class="las la-map-marker"></i>
+                    <span class="prompt-destination-label"></span>
+                  </p>
+                  <p class="m-0">
+                    <small class="text-muted prompt-duration-label"></small>
+                  </p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                  <strong>Total Fare:</strong>
+                  <strong class="prompt-fare-label"></strong>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn text-muted prompt-reject-button" data-bs-dismiss="modal">Reject</button>
+                <button type="button" class="btn btn-primary prompt-accept-button" data-bs-dismiss="modal">Accept</button>
+              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -104,31 +163,59 @@
 
 {% block footer %}
   <script>
-    let coordinates = []
-    let map = null
-    document.addEventListener('DOMContentLoaded', () => {
-      const requestLocation = () => {
-        if (!'geolocation' in navigator) {
-          return showError('Your browser does not support geolocation, please update it and try again.')
-        }
+    document.addEventListener('DOMContentLoaded', async () => {
+      let coordinates = []
+      let map = null
 
-        navigator.geolocation.getCurrentPosition(
-          pos => renderMap(pos.coords.latitude, pos.coords.longitude),    
-          () => showError('Could not retrieve your current location, please turn on your location and try again.')
-        )
+      const geocodeService = L.esri.Geocoding.geocodeService();
+
+      const requestLocation = () => {
+        return new Promise((resolve, reject) => {
+          if (!'geolocation' in navigator) {
+            reject(new Error('Your browser does not support geolocation, please update it and try again.'))
+          }
+
+          navigator.geolocation.getCurrentPosition(
+            pos => {
+              // map = renderMap(pos.coords.latitude, pos.coords.longitude)
+              const { latitude, longitude } = pos.coords
+
+              geocodeService.reverse().latlng([latitude, longitude]).run(function(error, result) {
+                if (error) {
+                  reject(error)
+                  return;
+                }
+
+                resolve({
+                  latitude,
+                  longitude,
+                  text: result.address.LongLabel
+                })
+
+                // if (!localStorage.getItem('toggle')) {
+                //   return;
+                // }
+
+                // if (localStorage.getItem('toggle') == 'true') {
+                //   document.getElementById('switch').checked = true;
+                //   socket.emit('active', coordinates, address);
+                // }
+              })
+            },       
+            () => {
+              reject(new Error('Could not retrieve your current location, please turn on your location and try again.'))
+              // showError('Could not retrieve your current location, please turn on your location and try again.')
+            }
+          )
+        })
       }
 
-      const renderMap = (latitude, longitude) => {
+      const renderMap = (latitude, longitude, text, id = 'map') => {
         if (typeof L != 'object') {
           return
         }
 
-        const geocodeService = L.esri.Geocoding.geocodeService();
-        const arcgisOnline = L.esri.Geocoding.arcgisOnlineProvider({
-          countries: ['PH']
-        });
-
-        map = L.map(document.getElementById('map'))
+        const map = L.map(document.getElementById(id))
           .setView([latitude, longitude], 16);
 
         L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
@@ -138,35 +225,31 @@
           minZoom: 13
         }).addTo(map);
 
-        geocodeService.reverse().latlng([latitude, longitude]).run(function(error, result) {
-          if (error) {
-            return;
-          }
+        L.marker([latitude, longitude])
+          .bindPopup(`
+            ${text}
+          `)
+          .addTo(map)
+          .openPopup();
 
-          let { LongLabel } = result.address;
+        {% if CURRENT_BOOK.geoJSON %}
+          L.geoJSON(JSON.parse(`{{ CURRENT_BOOK.geoJSON|stringify }}`)).addTo(map)
+        {% endif %}
 
-          coordinates = [longitude, latitude];
-          address = LongLabel;
-
-          const currentLocationMarker = L.marker([latitude, longitude])
-            .bindPopup(`
-              ${LongLabel}
-            `)
+        {% if CURRENT_BOOK %}
+          L.marker(['{{ CURRENT_BOOK.ride.destination.coordinates[1] }}', '{{ CURRENT_BOOK.ride.destination.coordinates[0] }}'])
+            .bindPopup('{{ CURRENT_BOOK.ride.destination.text }}')
             .addTo(map)
-            .openPopup();
 
-          // if (!localStorage.getItem('toggle')) {
-          //   return;
-          // }
+          L.marker(['{{ CURRENT_BOOK.ride.destination.coordinates[1] }}', '{{ CURRENT_BOOK.ride.destination.coordinates[0] }}'])
+            .bindPopup('{{ CURRENT_BOOK.ride.destination.text }}')
+            .addTo(map)
+        {% endif %}
 
-          // if (localStorage.getItem('toggle') == 'true') {
-          //   document.getElementById('switch').checked = true;
-          //   socket.emit('active', coordinates, address);
-          // }
-        })
+        return map
       }
 
-      const initializeToggle = () => {
+      const initializeToggle = (coordinates, text) => {
         const toggler = document.getElementById('toggle')
         const label = document.querySelector('label[for="toggle"]')
 
@@ -182,12 +265,14 @@
             label.classList.add('text-primary')
             label.classList.remove('text-muted')
             localStorage.setItem('onDuty', true)
+            socket.emit('active', coordinates, text)
           }
           else {
             label.innerText = 'Off-duty'
             label.classList.remove('text-primary')
             label.classList.add('text-muted')
             localStorage.setItem('onDuty', false)
+            socket.emit('inactive')
           }
         }
 
@@ -198,8 +283,72 @@
         })
       }
 
-      requestLocation()
-      initializeToggle()
+      const initializeSocketEvents = () => {
+        const formatter = new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 2
+        })
+
+        socket.on('ride completed', () => window.location.reload())
+
+        socket.on('prompt', (book, user) => {
+          document.querySelector('.prompt-source-label').innerText = book.ride.source.text
+          document.querySelector('.prompt-destination-label').innerText = book.ride.destination.text
+          document.querySelector('.prompt-duration-label').innerText = `Approx. ${Math.ceil(book.ride.duration / 60)} mins. (${Math.ceil(book.ride.distance)} km)`
+          document.querySelector('.prompt-fare-label').innerText = `Php ${formatter.format(parseFloat(book.ride.fare))}`
+          document.querySelector('.prompt-commuter-image').src = user.picture ? `/api/uploads/${user.picture}?width=80&height=80` : `https://avatars.dicebear.com/api/initials/${user.full_name}.svg?width=80&height=80`
+          document.querySelector('.prompt-commuter-name').innerText = user.full_name
+          document.querySelector('.prompt-commuter-contact').href = `tel:${user.contact_number}`
+
+          document.querySelectorAll('.prompt-reject-button').forEach(v => {
+            const click = () => {
+              socket.emit('reject book', book)
+            }
+
+            v.removeEventListener('click', click)
+            v.addEventListener('click', click)
+          })
+
+          document.querySelectorAll('.prompt-accept-button').forEach(v => {
+            const click = () => {
+              socket.emit('accept book', book)
+            }
+
+            v.removeEventListener('click', click)
+            v.addEventListener('click', click)
+          })
+
+          document.getElementById('promptButton').click()
+        })
+
+        const buttonHere = document.getElementById('btn-here')
+
+        buttonHere?.addEventListener('click', () => {
+          socket.emit('i am here', '{{ CURRENT_BOOK.commuter._id }}')
+        })
+
+        const buttonDone = document.getElementById('btn-done')
+
+        buttonDone?.addEventListener('click', () => {
+          if (!confirm('Are you sure you want to end the ride?')) {
+            return
+          }
+
+          socket.emit('ride completed', '{{ CURRENT_BOOK._id }}', '{{ CURRENT_BOOK.commuter._id }}')
+        })
+      }
+
+      try {
+        const { latitude, longitude, text } = await requestLocation()
+        coordinates = [longitude, latitude]
+
+        map = renderMap(latitude, longitude, text)
+
+        initializeToggle(coordinates, text)
+        initializeSocketEvents()
+      }
+      catch(err) {
+        showError(err.message)
+      }
     })
   </script>
 {% endblock %}

@@ -107,6 +107,6 @@ app.use('/api', require('./src/routes/api/api.route'))
 app.use('/', require('./src/routes/pages/commuter/index.route'))
 
 // Require socket io helper
-require('./src/utils/ws')(io)
+require('./src/utils/websockets/ws')(io)
 
 httpServer.listen(PORT, () => console.log(`${BASE_URL}`))

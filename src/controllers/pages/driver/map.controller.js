@@ -7,5 +7,5 @@ const { Request, Response } = require('express')
  * @param {Response} res 
  */
 exports.index = function(req, res) {
-  return res.render('driver/map/index.twig', { time: Date.now() })
+  return res.render('driver/map/index.twig')
 }

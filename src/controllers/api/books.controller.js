@@ -11,10 +11,9 @@ exports.store = async function(req, res) {
   try {
     const book = await Book.create(req.body)
 
-    // TODO :: Check drivers online in sockets ...
-
     res.json({
-      message: 'Successfully booked a ride. Please wait for a driver to accept it.'
+      message: 'Successfully booked a ride. Please wait for a driver to accept it.',
+      sub: book
     })
   }
   catch(err) {

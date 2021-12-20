@@ -31,5 +31,9 @@ module.exports = function(twig) {
     return `Php ${formatter.format(parseFloat(v))}`
   })
 
+  twig.extendFilter('stringify', (v) => {
+    return JSON.stringify(v)
+  })
+
   return twig;
 };

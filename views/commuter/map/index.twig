@@ -1,4 +1,4 @@
-{% extends "base.twig" %}
+{% extends "commuter/layouts/main.twig" %}
 
 {% block title %}
   Map
@@ -395,6 +395,12 @@
         })
       }
 
+      const initializeSocketEvents = () => {
+        socket.on('ride accepted', driver => {
+          window.location.reload()
+        })
+      }
+
       try {
         const { latitude, longitude, text } = await requestLocation()
         coordinates = [longitude, latitude]
@@ -402,6 +408,8 @@
         map = renderMap(latitude, longitude, text)
 
         initializeBookMap(latitude, longitude, text)
+
+        initializeSocketEvents()
       }
       catch(err) {
         showError(err.message)

@@ -68,18 +68,6 @@ module.exports = function(io) {
       await ActiveDriver.deleteOne({ user: socket.user._id })
     })
 
-    socket.on('driver sent message', (body, user_id) => {
-      const commuter = Commuters.get(user_id)
-
-      if (!commuter) {
-        return
-      }
-
-      io.of('/commuters')
-        .to(commuter.socket_id)
-        .emit('driver sent message', body)
-    })
-
     socket.on('accept book', (book) => {
       DriverEventEmitter.emit('assign book', book, socket.user._id)
     })
@@ -111,6 +99,18 @@ module.exports = function(io) {
       socket.emit('ride completed')
     })
 
+    socket.on('driver sent message', (book_id, commuter_id, body) => {
+      const commuter = Commuters.get(commuter_id)
+
+      if (!commuter) {
+        return
+      }
+
+      io.of('/commuters')
+        .to(commuter.socket_id)
+        .emit('driver sent message', body)
+    })
+
     // DriverEventEmitter.setDrivers(Drivers.getAll())
   })
 
@@ -139,7 +139,7 @@ module.exports = function(io) {
 
     DriverEventEmitter.setCommuters(Commuters.getAll())
 
-    socket.on('commuter sent message', (body, driver_id) => {
+    socket.on('commuter sent message', (book_id, driver_id, body) => {
       const driver = Drivers.get(driver_id)
 
       if (!driver) {

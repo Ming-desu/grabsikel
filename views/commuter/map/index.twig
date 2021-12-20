@@ -62,7 +62,7 @@
                       <i class="las la-phone"></i>
                       Call
                     </a>
-                    <a href="" class="rounded-pill ms-2 btn btn-sm btn-outline-secondary">
+                    <a href="#chatModal" role="button" class="rounded-pill ms-2 btn btn-sm btn-outline-secondary" data-bs-toggle="modal" title="Chat with driver">
                       <i class="las la-sms"></i>
                       Chat
                     </a>
@@ -96,6 +96,38 @@
           </div>
         {% endif %}
       </main>
+      {% if CURRENT_BOOK %}
+        <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <form action="/map/chat" class="modal-content" method="POST" autocomplete="off">
+              <input type="hidden" name="book_id" value="{{ CURRENT_BOOK._id }}">
+              <input type="hidden" name="driver_id" value="{{ CURRENT_BOOK.driver._id }}">
+              
+              <div class="modal-header">
+                <h5 class="modal-title" id="chatModalLabel">Chat with Driver</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" style="min-height: 360px">  
+                {# <div class="d-flex justify-content-end">
+                  <p class="rounded-pill bg-primary py-2 px-3 text-white">Kamote...</p>
+                </div>
+                <div class="d-flex justify-content-start">
+                  <p class="rounded-pill bg-light-100 py-2 px-3">Hello bonak</p>
+                </div> #}
+              </div>
+              <div class="modal-footer">
+                <div id="error-book"></div>
+                <div class="input-group">
+                  <input type="text" name="body" class="form-control" placeholder="Aa">
+                  <button type="submit" name="submit" class="btn btn-success">
+                    <i class="las la-paper-plane"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      {% endif %}
       {% if not CURRENT_BOOK %}
         <div class="position-fixed bottom-0 end-0 pe-none" style="z-index: 1000">
           <a href="#bookModal" role="button" class="btn btn-primary rounded-circle btn-square fs-3 shadow pe-auto btn-floating" data-bs-toggle="modal" title="Book a ride">
@@ -410,6 +442,63 @@
       const initializeSocketEvents = () => {
         socket.on('ride accepted', driver => {
           window.location.reload()
+        })
+
+        socket.on('driver sent message', body => {
+          const modal = document.getElementById('chatModal')
+
+          if (!modal || !modal.classList.contains('show')) {
+            alert('You have new message from your driver.')
+          }
+
+          const content = document.querySelector('#chatModal .modal-body')
+
+          if (!content) {
+            return
+          }
+          
+          content.innerHTML += `
+            <div class="d-flex justify-content-start">
+              <p class="rounded-pill bg-light-100 py-2 px-3">${body}</p>
+            </div>
+          `
+
+          content.scrollTop = content.clientHeight
+        })
+
+        const chatModalDOM = document.getElementById('chatModal')
+        
+        chatModalDOM?.addEventListener('shown.bs.modal', () => {
+          const form = chatModalDOM.querySelector('form')
+
+          form.body.focus()
+        })
+
+        const form = document.querySelector('#chatModal form')
+
+        form?.addEventListener('submit', function(e) {
+          e.preventDefault()
+
+          const book_id = this.book_id.value
+          const driver_id = this.driver_id.value
+          const body = this.body.value
+
+          if (!body) {
+            return
+          }
+
+          const content = this.querySelector('.modal-body')
+          content.innerHTML += `
+            <div class="d-flex justify-content-end">
+              <p class="rounded-pill bg-primary py-2 px-3 text-white">${escapeHTML(body)}</p>
+            </div>
+          `
+
+          content.scrollTop = content.clientHeight
+
+          this.reset()
+
+          socket.emit('commuter sent message', book_id, driver_id, body)
         })
       }
 

@@ -84,3 +84,7 @@ body {
 .btn-floating {
   margin: 0 1rem 5.5rem 0;
 }
+
+.bg-light-100 {
+  background: #ececec;
+}

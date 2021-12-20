@@ -248,6 +248,18 @@
           .addTo(map)
           .openPopup();
 
+        {% if CURRENT_BOOK.geoJSON %}
+          L.geoJSON(JSON.parse(`{{ CURRENT_BOOK.geoJSON|stringify }}`)).addTo(map)
+        {% endif %}
+
+        {% if CURRENT_BOOK %}
+          // TODO :: Add Driver Marker
+
+          L.marker(['{{ CURRENT_BOOK.ride.destination.coordinates[1] }}', '{{ CURRENT_BOOK.ride.destination.coordinates[0] }}'])
+            .bindPopup('{{ CURRENT_BOOK.ride.destination.text }}')
+            .addTo(map)
+        {% endif %}
+
         return map
       }
 

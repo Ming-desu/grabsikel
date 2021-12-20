@@ -237,8 +237,8 @@
         {% endif %}
 
         {% if CURRENT_BOOK %}
-          L.marker(['{{ CURRENT_BOOK.ride.destination.coordinates[1] }}', '{{ CURRENT_BOOK.ride.destination.coordinates[0] }}'])
-            .bindPopup('{{ CURRENT_BOOK.ride.destination.text }}')
+          L.marker(['{{ CURRENT_BOOK.ride.source.coordinates[1] }}', '{{ CURRENT_BOOK.ride.source.coordinates[0] }}'])
+            .bindPopup('{{ CURRENT_BOOK.ride.source.text }}')
             .addTo(map)
 
           L.marker(['{{ CURRENT_BOOK.ride.destination.coordinates[1] }}', '{{ CURRENT_BOOK.ride.destination.coordinates[0] }}'])

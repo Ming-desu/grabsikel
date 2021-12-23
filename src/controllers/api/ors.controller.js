@@ -1,6 +1,8 @@
 const { Request, Response } = require('express')
 const axios = require('axios')
 const { ORS_SECRET } = require('../../../config')
+const DriverEventEmitter = require('../../utils/websockets/DriverEventEmitter')
+const Settings = require('../../models/Settings')
 
 /**
  * Gets matrix for source and destination
@@ -28,7 +30,12 @@ exports.matrix = async function(req, res) {
       }
     })
 
-    const fare = 15 + (Math.ceil(data.distances[0]) * 5)
+    let fare = 15 + (Math.ceil(data.distances[0]) * 5)
+
+    if (DriverEventEmitter.getCommuters().length > DriverEventEmitter.getDrivers().length) {
+      const settings = await Settings.findOne({ })
+      fare += (fare * settings.rate)
+    }
 
     res.json({
       message: 'ok',

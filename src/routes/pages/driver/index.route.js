@@ -67,7 +67,8 @@ Router.use(async (req, res, next) => {
 // Router.use('/commuters', require('./commuters.route'))
 // Router.use('/drivers', require('./drivers.route'))
 // Router.use('/users', require('./users.route'))
-Router.get('', (req, res) => res.redirect('/driver/map'))
+Router.get('', (req, res) => res.redirect('/driver/dashboard'))
+Router.use('/dashboard', require('./dashboard.route'))
 Router.use('/map', require('./map.route'))
 Router.use('/profile', require('./profile.route'))
 

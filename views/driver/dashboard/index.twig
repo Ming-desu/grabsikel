@@ -1,0 +1,71 @@
+{% extends "commuter/layouts/main.twig" %}
+
+{% block title %}
+  Dashboard
+{% endblock %}
+
+{% block body %}
+  <div class="vh-100">
+    <div class="d-flex flex-column h-100">
+      {% include "driver/layouts/header.twig" %}
+      <main class="flex-fill p-3">
+        <h1 class="h4 mb-4">Ride History</h1>
+
+        {% if rides|length > 0 %}
+          {% for ride in rides %}
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between">
+                <strong>
+                  #{{ loop.index }} - {{ ride.commuter.full_name }}
+                </strong>
+                <p class="m-0 text-end">
+                  <small class="text-muted">
+                    {{ ride.formatted_date }}
+                  </small><br>
+                  <span class="badge rounded-pill bg-primary">
+                    {{ ride.status }}
+                  </span>
+                </p>
+              </div>
+              <div class="card-body">
+                <div class="text-center">
+                  <p class="m-0">
+                    <i class="las la-map-marker"></i>
+                    {{ ride.ride.source.text }}
+                  </p>
+                  <i class="las la-arrow-down"></i>
+                  <p>
+                    <i class="las la-map-marker"></i>
+                    {{ ride.ride.destination.text }}
+                  </p>
+                  <p class="m-0">
+                    <small class="text-muted">
+                      {{ ride.ride.distance|format_distance }}
+                    </small>
+                  </p>
+                </div>
+              </div>
+              {% if ride.feedback %}
+                <div class="dropdown-divider mb-0"></div>
+                <div class="card-body">
+                  <strong>Feedback:</strong> {{ ride.feedback }}
+                </div>
+              {% endif %}
+              <div class="card-footer d-flex justify-content-between">
+                <strong>Total Fare:</strong>
+                <strong>{{ ride.ride.fare|format_fare }}</strong>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="card">
+            <div class="card-body">
+              <p class="card-text m-0 text-center">No ride history available.</p>
+            </div>
+          </div>
+        {% endif %}
+      </main>
+      {% include "driver/layouts/nav.twig" %}
+    </div>
+  </div>
+{% endblock %}

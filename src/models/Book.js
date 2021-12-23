@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const moment = require('moment')
 
 const schema = mongoose.Schema({
   ride: {
@@ -36,5 +37,11 @@ const schema = mongoose.Schema({
     updatedAt: 'updated_at'
   }
 })
+
+schema.virtual('formatted_date').get(function() {
+  return moment(this.created_at).format('lll')
+})
+
+schema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('Book', schema)

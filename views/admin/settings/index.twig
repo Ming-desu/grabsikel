@@ -1,0 +1,76 @@
+{% extends "base.twig" %}
+
+{% block title %}
+  Settings
+{% endblock %}
+
+{% block body %}
+  <div class="container p-0 min-vh-100">
+    <div class="d-flex min-vh-100">
+      {% include "admin/layouts/nav.twig" %}
+      <main class="col-12 col-md-8 col-lg-9 col-xl-10">
+        {% include "admin/layouts/header.twig" %}
+        <div class="p-4">
+          <nav class="mb-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">Home</li>
+              <li class="breadcrumb-item active" aria-current="page">Settings</li>
+            </ol>
+          </nav>
+          <form action="/admin/settings" method="POST">
+            <input type="hidden" name="_id" value="{{ CURRENT_SETTINGS._id }}">
+            <div id="error"></div>
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <h3 class="card-title h5">Settings</h3>
+                    <p class="card-text text-muted mb-4">Please provide all the necessary details.</p>
+                    <div class="form-floating mb-3">
+                      <input type="number" name="rate" id="rate" step="0.01" class="form-control" placeholder="0.1" value="{{ CURRENT_SETTINGS.rate }}" required>
+                      <label for="rate">Increase rate (e.g. 0.4 for 40%)</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <a href="/admin/settings" class="btn border text-muted me-2">Cancel</a>
+                  <button type="submit" name="submit" class="btn btn-primary">Save</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+ <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form')
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault()
+        
+        const _id = this._id.value
+        const rate = this.rate.value
+
+        if (!rate) {
+          return showError('Please provide the increase rate.')
+        }
+
+        this.submit.disabled = true
+
+        axios.post(this.action, {
+          _id,
+          rate
+        })
+          .then(res => window.location.href = '/admin/settings')
+          .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))
+
+        this.submit.disabled = false
+      })
+    })
+ </script>
+{% endblock %}

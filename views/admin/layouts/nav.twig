@@ -38,6 +38,12 @@
         </a>
       </li>
       <li class="list-group-item bg-dark">
+        <a href="/admin/settings" class="text-decoration-none btn {{ path|indexOf('/admin/settings') > -1 ? 'btn-primary' : 'btn-dark' }} w-100 d-flex align-items-center text-start">
+          <i class="las la-cog"></i>
+          <span class="ms-2">Settings</span>
+        </a>
+      </li>
+      <li class="list-group-item bg-dark">
         <a href="/admin/auth/logout" class="text-decoration-none btn btn-dark w-100 d-flex align-items-center text-start">
           <i class="las la-sign-out-alt"></i>
           <span class="ms-2">Logout</span>

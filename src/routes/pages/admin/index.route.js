@@ -49,5 +49,6 @@ Router.use('/commuters', require('./commuters.route'))
 Router.use('/drivers', require('./drivers.route'))
 Router.use('/books', require('./books.route'))
 Router.use('/users', require('./users.route'))
+Router.use('/settings', require('./settings.route'))
 
 module.exports = Router

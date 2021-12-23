@@ -28,7 +28,8 @@ const schema = mongoose.Schema({
     type: String,
     enum: ['pending', 'accepted', 'cancelled', 'completed'],
     default: 'pending'
-  }
+  },
+  feedback: String
 }, {
   timestamps: {
     createdAt: 'created_at',

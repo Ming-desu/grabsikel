@@ -2,6 +2,7 @@ const { Request, Response } = require('express')
 const axios = require('axios')
 const ActiveDriver = require('../../../models/ActiveDriver')
 const DriverEventEmitter = require('../../../utils/websockets/DriverEventEmitter')
+const Book = require('../../../models/Book')
 
 /**
  * Shows index page for map
@@ -80,6 +81,42 @@ exports.store = async function(req, res) {
 
     res.status(400).json({
       errors
+    })
+  }
+}
+
+/**
+ * Saves feedback from the database
+ * 
+ * @param {Request} req 
+ * @param {Response} res 
+ */
+exports.feedback = async function(req, res) {
+  try {
+    const { book_id, feedback } = req.body
+    const book = await Book.findById(book_id)
+
+    if (!book) {
+      throw new Error('Book does not exists.')
+    }
+
+    if (book.commuter.toString() != res.locals.AUTHENTICATED_USER._id.toString()) {
+      throw new Error('Book does not exists.')
+    }
+
+    book.set({
+      feedback
+    })
+
+    await book.save()
+
+    res.json({
+      message: 'We received your feedback. Thank you!'
+    })
+  }
+  catch(err) {
+    res.status(400).json({
+      errors: [err.message]
     })
   }
 }

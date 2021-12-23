@@ -11,7 +11,7 @@
       <main class="flex-fill p-3">
         <h1 class="h4 mb-4">Your Profile</h1>
         <div id="error"></div>
-        <form action="/admin/drivers/{{ AUTHENTICATED_USER._id }}/edit" method="POST" enctype="multipart/form-data">
+        <form action="/driver/profile" name="form_edit" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="_id" value="{{ AUTHENTICATED_USER._id }}">
           <div class="card mb-4">
             <div class="card-body">
@@ -26,8 +26,8 @@
                 <label for="email">Email address</label>
               </div>
               <div class="form-floating">
-                <input type="email" name="email" id="email" class="form-control" placeholder="Password">
-                <label for="email">Change Password (Optional)</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password">
+                <label for="password">Change Password (Optional)</label>
               </div>
             </div>
           </div>
@@ -99,3 +99,79 @@
   </div>
 {% endblock %}
 
+{% block footer %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.forms.form_edit
+
+      form?.addEventListener('submit', async function(e) {
+        e.preventDefault()
+
+        const _id = this._id.value
+        const email = this.email.value
+        const contact_number = this.contact_number.value
+        const street = this.street.value
+        const barangay = this.barangay.value
+        const municipality = this.municipality.value
+        const province = this.province.value
+        const first_name = this.first_name.value
+        const middle_name = this.middle_name.value
+        const last_name = this.last_name.value
+        const sex = this.querySelector('[name="sex"]:checked').value
+        const password = this.password.value || null
+
+        if (!email || !contact_number || !barangay || !municipality || !province || !first_name || !last_name) {
+          return showError('Please fill out the required fields.')
+        }
+
+        let picture = null
+
+        if (this.picture.files.length > 0) {
+          const file = this.picture.files[0]
+          const extension = file.name.split('.').pop()
+
+          if (['jpg', 'png'].indexOf(extension.toLowerCase()) == -1) {
+            return showError('Please select an image with the following format .jpg or .png.')
+          }
+
+          const formData = new FormData()
+          formData.set('picture', file)
+
+          const { data: { path } } = await axios.post('/api/uploads', formData) 
+
+          picture = path
+        }
+        
+        this.submit.disabled = true
+
+        axios.patch(this.action, {
+          _id,
+          profile: {
+            name: {
+              first_name,
+              middle_name,
+              last_name
+            },
+            sex,
+            picture
+          },
+          contact: {
+            number: contact_number,
+            address: {
+              street,
+              barangay,
+              municipality,
+              province
+            }
+          },
+          email,
+          password
+        })
+          .then(res => window.location.reload())
+          .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))
+
+        this.submit.disabled = false
+      })
+    })
+  </script>
+{% endblock %}

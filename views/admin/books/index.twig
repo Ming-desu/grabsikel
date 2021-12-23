@@ -1,0 +1,125 @@
+{% extends "base.twig" %}
+
+{% block title %}
+  Book History
+{% endblock %}
+
+{% block body %}
+  <div class="container p-0 min-vh-100">
+    <div class="d-flex min-vh-100">
+      {% include "admin/layouts/nav.twig" %}
+      <main class="col-12 col-md-8 col-lg-9 col-xl-10">
+        {% include "admin/layouts/header.twig" %}
+        <div class="p-4">
+          <nav class="mb-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">Home</li>
+              <li class="breadcrumb-item active" aria-current="page">Books</li>
+            </ol>
+          </nav>
+          <form action="/admin/books/read" class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4 ms-auto mb-4" method="GET">
+            <div class="input-group">
+              <input type="text" name="q" id="q" class="form-control" placeholder="Search something...">
+              <button type="submit" class="btn btn-success">
+                <i class="las la-search"></i>
+              </button>
+            </div>
+          </form>
+          <div class="row" id="records">
+            <div class="col-12 text-center">No data available</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form');
+
+      const fetch = () => {
+        const q = form.q.value;
+
+        axios.get(`${form.action}?q=${q}`)
+          .then(res => res.data)
+          .then(data => render(data.sub));
+      };
+
+      const render = sub => {
+        const container = document.getElementById('records');
+        container.innerHTML = '';
+
+        if (sub.length <= 0) {
+          return container.innerHTML = `
+            <div class="col-12 text-center">No data available</div>
+          `;
+        }
+
+        const formatter = new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 2
+        })
+
+        sub.forEach(x => {
+          container.innerHTML += `
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card border-0 shadow mb-4">
+                <div class="card-header d-flex justify-content-between">
+                  <strong>
+                    Driver: ${escapeHTML([x.driver.profile.name.first_name, x.driver.profile.name.last_name].join(' '))}<br>
+                    Commuter: ${escapeHTML([x.commuter.name.first_name, x.commuter.name.last_name].join(' '))}
+                  </strong>
+                  <p class="m-0 text-end">
+                    <small class="text-muted">
+                      ${x.formatted_date}
+                    </small><br>
+                    <span class="badge rounded-pill bg-primary">
+                      ${escapeHTML(x.status)}
+                    </span>
+                  </p>
+                </div>
+                <div class="card-body">
+                  <div class="text-center">
+                    <p class="m-0">
+                      <i class="las la-map-marker"></i>
+                      ${x.ride.source.text}
+                    </p>
+                    <i class="las la-arrow-down"></i>
+                    <p>
+                      <i class="las la-map-marker"></i>
+                      ${x.ride.destination.text}
+                    </p>
+                    <p class="m-0">
+                      <small class="text-muted">
+                        ${Math.ceil(x.ride.distance)} km
+                      </small>
+                    </p>
+                  </div>
+                </div>
+                ${x.feedback ? `
+                  <div class="dropdown-divider mb-0"></div>
+                  <div class="card-body">
+                    <strong>Feedback:</strong> ${ x.feedback }
+                  </div>
+                ` : ``}
+                <div class="card-footer d-flex justify-content-between">
+                  <strong>Total Fare:</strong>
+                  <strong>${x.ride.fare ? 'Php ' + formatter.format(parseFloat(x.ride.fare)): 'N/A'}</strong>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      };
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        fetch();
+      });
+
+      fetch();
+    });
+  </script>
+{% endblock %}

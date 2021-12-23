@@ -47,6 +47,7 @@ Router.use(async (req, res, next) => {
 Router.get('', (req, res) => res.redirect('/admin/commuters'))
 Router.use('/commuters', require('./commuters.route'))
 Router.use('/drivers', require('./drivers.route'))
+Router.use('/books', require('./books.route'))
 Router.use('/users', require('./users.route'))
 
 module.exports = Router

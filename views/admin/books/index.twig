@@ -61,14 +61,13 @@
           minimumFractionDigits: 2
         })
 
-        sub.forEach(x => {
+        sub.forEach((x, i) => {
           container.innerHTML += `
             <div class="col-12 col-md-6 col-lg-4">
               <div class="card border-0 shadow mb-4">
                 <div class="card-header d-flex justify-content-between">
                   <strong>
-                    Driver: ${escapeHTML([x.driver.profile.name.first_name, x.driver.profile.name.last_name].join(' '))}<br>
-                    Commuter: ${escapeHTML([x.commuter.name.first_name, x.commuter.name.last_name].join(' '))}
+                    #${i + 1}
                   </strong>
                   <p class="m-0 text-end">
                     <small class="text-muted">
@@ -79,6 +78,17 @@
                     </span>
                   </p>
                 </div>
+                <div class="card-body">
+                  <p class="m-0">
+                    <strong>Driver:</strong>
+                    ${escapeHTML([x.driver.profile.name.first_name, x.driver.profile.name.last_name].join(' '))}
+                  </p>
+                  <p class="m-0">
+                    <strong>Commuter:</strong>
+                    ${escapeHTML([x.commuter.name.first_name, x.commuter.name.last_name].join(' '))}
+                  </p>
+                </div>
+                <div class="dropdown-divider mt-0"></div>
                 <div class="card-body">
                   <div class="text-center">
                     <p class="m-0">

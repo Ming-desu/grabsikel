@@ -2,26 +2,16 @@ const mongoose = require('mongoose')
 
 const schema = mongoose.Schema({
   name: {
-    first_name: {
-      type: String,
-      required: true
-    },
+    first_name: String,
     middle_name: String,
-    last_name: {
-      type: String,
-      required: true
-    }
+    last_name: String
   },
   sex: {
     type: String,
-    enum: ['Male', 'Female'],
-    required: true
+    enum: ['Male', 'Female']
   },
   picture: String,
-  contact_number: {
-    type: String, 
-    required: true
-  },
+  contact_number: String,
   email: {
     type: String,
     required: true

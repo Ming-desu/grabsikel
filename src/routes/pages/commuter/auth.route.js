@@ -23,5 +23,7 @@ Router.use(async (req, res, next) => {
 Router.get('', (req, res) => res.redirect('/auth/login'))
 Router.get('/login', controller.index)
 Router.post('/login', controller.login)
+Router.get('/register', controller.register)
+Router.post('/register', controller.signup)
 
 module.exports = Router

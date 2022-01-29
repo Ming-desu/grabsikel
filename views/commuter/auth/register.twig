@@ -1,12 +1,12 @@
 {% extends "base.twig" %}
 
 {% block title %}
-  Commuter Login
+  Commuter Register
 {% endblock %}
 
 {% block body %}
   <div class="d-md-flex flex-column align-items-center justify-content-center py-5">
-    <h1 class="text-center mb-5">Commuter Login</h1>
+    <h1 class="text-center mb-5">Commuter Register</h1>
     <div class="col-12 col-sm-11 col-md-10 col-lg-9 col-xl-7">
       <div id="error"></div>
       <div class="card overflow-hidden">
@@ -15,8 +15,8 @@
             <img src="/img/grabsikel.svg" class="img-fluid d-block mx-auto p-4" width="200" height="200" alt="Grabsikel Logo">
           </div>
           <div class="col-md-6">
-            <form action="/auth/login" class="card-body p-4" method="POST">
-              <h2 class="h4 mb-4">Please log-in.</h2>
+            <form action="/auth/register" class="card-body p-4" method="POST">
+              <h2 class="h4 mb-4">Register your account.</h2>
               <div class="form-group mb-2">
                 <label for="email" class="form-label">Email address</label>
                 <input type="email" name="email" id="email" class="form-control" placeholder="joesmith@domain.com">
@@ -26,8 +26,8 @@
                 <input type="password" name="password" id="password" class="form-control" placeholder="********">
               </div>
               <div class="text-end">
-                <a href="/auth/login" class="btn text-muted me-3">Register</a>
-                <button type="submit" name="submit" class="btn btn-primary">Sign in</button>
+                <a href="/auth/login" class="btn text-muted me-3">Log in</a>
+                <button type="submit" name="submit" class="btn btn-primary">Sign up</button>
               </div>
             </form>
           </div>
@@ -49,7 +49,7 @@
         const password = this.password.value;
 
         if (!email || !password) {
-          return showError('Invalid username or password.')
+          return showError('Please fill out all the required fields.')
         }
 
         this.submit.disabled = true
@@ -57,7 +57,7 @@
         axios.post(this.action, {
           email, password
         })
-          .then(res => window.location.href = '/')
+          .then(res => window.location.href = '/login')
           .catch(err => showError((err.response.data.errors || ['Server error. Please contact your developer.'])[0]))
 
         this.submit.disabled = false
